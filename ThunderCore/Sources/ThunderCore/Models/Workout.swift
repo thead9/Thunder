@@ -34,6 +34,12 @@ public final class Workout {
     @Relationship(deleteRule: .cascade)
     public var sets = [WorkoutSet]()
 
+    /// Plans that were completed as this workout, if any.
+    ///
+    /// Delete rule is `.nullify` — plans survive if the workout log is deleted.
+    @Relationship(deleteRule: .nullify)
+    public var plannedWorkouts = [PlannedWorkout]()
+
     /// The UUID of the correlated `HKWorkout`, if one exists.
     ///
     /// Populated by the HealthKit service (BIZ-2). `nil` for manually entered workouts

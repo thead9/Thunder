@@ -27,6 +27,12 @@ public final class WorkoutTemplate {
     @Relationship(deleteRule: .cascade)
     public var sets = [TemplateSet]()
 
+    /// Plans generated from this template, if any.
+    ///
+    /// Delete rule is `.nullify` — plans survive if the template is deleted.
+    @Relationship(deleteRule: .nullify)
+    public var plans = [PlannedWorkout]()
+
     public init(
         id: UUID = UUID(),
         name: String = "",
