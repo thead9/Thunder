@@ -19,10 +19,10 @@ struct WorkoutTemplateDefaultsTests {
         #expect(template.notes == nil)
     }
 
-    @Test("sets defaults to empty array")
+    @Test("sets defaults to nil (no sets)")
     func setsDefault() {
         let template = WorkoutTemplate()
-        #expect(template.sets.isEmpty)
+        #expect((template.sets ?? []).isEmpty)
     }
 }
 
@@ -69,12 +69,14 @@ struct WorkoutTemplatePersistenceTests {
         context.insert(set0)
         context.insert(set1)
         context.insert(set2)
-        template.sets.append(contentsOf: [set0, set1, set2])
+        set0.template = template
+        set1.template = template
+        set2.template = template
         try context.save()
 
         let fetched = try context.fetch(FetchDescriptor<WorkoutTemplate>())
         let fetchedTemplate = try #require(fetched.first)
-        let sortedSets = fetchedTemplate.sets.sorted { $0.setIndex < $1.setIndex }
+        let sortedSets = (fetchedTemplate.sets ?? []).sorted { $0.setIndex < $1.setIndex }
 
         #expect(sortedSets.count == 3)
         #expect(sortedSets[0].exerciseName == "Bench Press")
@@ -94,7 +96,8 @@ struct WorkoutTemplatePersistenceTests {
         let set1 = TemplateSet(exerciseName: "Row", setIndex: 1)
         context.insert(set0)
         context.insert(set1)
-        template.sets.append(contentsOf: [set0, set1])
+        set0.template = template
+        set1.template = template
         try context.save()
 
         context.delete(template)
@@ -117,5 +120,23 @@ struct WorkoutTemplatePersistenceTests {
         let results = try context.fetch(FetchDescriptor<WorkoutTemplate>())
         #expect(results.count == 2)
         #expect(results[0].id != results[1].id)
+    }
+
+    @Test("deleting WorkoutTemplate nullifies plan.template, plan survives")
+    func templateDeletionNullifiesPlan() throws {
+        let context = try makeTestContext()
+
+        let template = WorkoutTemplate(name: "Push Day")
+        context.insert(template)
+        let plan = PlannedWorkout(scheduledDate: .now, template: template)
+        context.insert(plan)
+        try context.save()
+
+        context.delete(template)
+        try context.save()
+
+        let plans = try context.fetch(FetchDescriptor<PlannedWorkout>())
+        #expect(plans.count == 1)
+        #expect(plans[0].template == nil)
     }
 }

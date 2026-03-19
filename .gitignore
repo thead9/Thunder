@@ -117,3 +117,12 @@ iOSSimulatorLocalData/
 # Misc
 # ========================
 *.log
+
+
+# ========================
+# Generated Xcode projects
+# These are produced by xcodegen — run `xcodegen generate` from the app
+# directory to regenerate. Never commit generated .xcodeproj directories;
+# Xcode writes personal state (team ID, local paths) back into them.
+# ========================
+Training/Training.xcodeproj/

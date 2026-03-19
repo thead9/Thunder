@@ -23,15 +23,15 @@ import SwiftData
 /// likely added as a lightweight `String?` migration on this model.
 @Model
 public final class WorkoutSet {
-    public var id: UUID
-    public var exerciseName: String
-    public var setIndex: Int
+    public var id: UUID = UUID()
+    public var exerciseName: String = ""
+    public var setIndex: Int = 0
     public var reps: Int?
     public var weightKg: Double?
     public var distanceMeters: Double?
     public var durationSeconds: Double?
     public var notes: String?
-    public var createdAt: Date
+    public var createdAt: Date = Date.now
 
     /// The parent workout this set belongs to.
     ///

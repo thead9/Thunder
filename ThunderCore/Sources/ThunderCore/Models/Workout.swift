@@ -5,8 +5,8 @@ import SwiftData
 ///
 /// `Workout` is the core log entry in the Training domain. It is the most-written
 /// and most-queried model in the suite. Every field is either optional or carries
-/// a default value to satisfy CloudKit's requirement that no non-optional attribute
-/// is nil on first sync.
+/// a default value at the declaration site to satisfy CloudKit's requirement that
+/// no non-optional attribute lacks a default on first sync.
 ///
 /// ## HealthKit correlation
 /// `healthKitID` stores the `UUID` of a matching `HKWorkout` when one exists.
@@ -20,33 +20,35 @@ import SwiftData
 /// must declare an explicit delete rule — never rely on the default.
 @Model
 public final class Workout {
-    public var id: UUID
-    public var date: Date
+    public var id: UUID = UUID()
+    public var date: Date = Date.now
     public var duration: TimeInterval?
-    public var activityType: String
+    public var activityType: String = ""
     public var notes: String?
-    public var source: WorkoutSource
+    public var source: WorkoutSource = WorkoutSource.manual
 
     /// The sets logged within this workout, in no guaranteed order.
     ///
     /// Sort by `setIndex` when displaying. Delete rule is `.cascade` — all
     /// associated `WorkoutSet` records are deleted when this workout is deleted.
+    /// Declared as `[WorkoutSet]?` per CloudKit's requirement that all relationships
+    /// be optional. Use `sets ?? []` when an empty array is needed.
     @Relationship(deleteRule: .cascade)
-    public var sets = [WorkoutSet]()
+    public var sets: [WorkoutSet]?
 
     /// Plans that were completed as this workout, if any.
     ///
     /// Delete rule is `.nullify` — plans survive if the workout log is deleted.
     @Relationship(deleteRule: .nullify)
-    public var plannedWorkouts = [PlannedWorkout]()
+    public var plannedWorkouts: [PlannedWorkout]?
 
     /// The UUID of the correlated `HKWorkout`, if one exists.
     ///
     /// Populated by the HealthKit service (BIZ-2). `nil` for manually entered workouts
     /// until a correlation is established.
     public var healthKitID: UUID?
-    public var createdAt: Date
-    public var modifiedAt: Date
+    public var createdAt: Date = Date.now
+    public var modifiedAt: Date = Date.now
 
     public init(
         id: UUID = UUID(),

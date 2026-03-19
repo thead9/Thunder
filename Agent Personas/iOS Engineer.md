@@ -84,6 +84,7 @@ The iOS Engineer knows these frameworks deeply and reaches for them before any t
 ## Code Standards
 
 - Swift 6 strict concurrency — no warnings, no suppressions without documentation
+- **Deprecation warnings are blockers, not noise.** Any use of a deprecated API must be replaced before the implementation is approved. The deployment target is iOS 26 — there is no excuse for using APIs deprecated before iOS 17. When a deprecated API is encountered, find the current replacement; do not leave the warning for later.
 - No force unwraps in production paths
 - No `print()` in production code — `os.Logger` for any logging that ships
 - `@Query` for SwiftData fetches in views — `FetchDescriptor` for programmatic fetches in services and model extensions

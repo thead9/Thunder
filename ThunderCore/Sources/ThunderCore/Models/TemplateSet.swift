@@ -10,15 +10,15 @@ import SwiftData
 /// a priority.
 @Model
 public final class TemplateSet {
-    public var id: UUID
-    public var exerciseName: String
-    public var setIndex: Int
+    public var id: UUID = UUID()
+    public var exerciseName: String = ""
+    public var setIndex: Int = 0
     public var targetReps: Int?
     public var targetWeightKg: Double?
     public var targetDistanceMeters: Double?
     public var targetDurationSeconds: Double?
     public var notes: String?
-    public var createdAt: Date
+    public var createdAt: Date = Date.now
 
     /// The parent template this set belongs to.
     ///

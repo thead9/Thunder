@@ -22,18 +22,18 @@ import SwiftData
 /// - `workout`: the `Workout` log entry created when this plan was completed, if any.
 @Model
 public final class PlannedWorkout {
-    public var id: UUID
-    public var scheduledDate: Date
+    public var id: UUID = UUID()
+    public var scheduledDate: Date = Date.now
 
     /// Raw `String` backing for `PlannedWorkoutStatus`.
     ///
     /// Use the computed `status` property in application code. Use `statusRawValue`
     /// directly only in `FetchDescriptor` predicates where enum values are not supported.
-    public var statusRawValue: String
+    public var statusRawValue: String = PlannedWorkoutStatus.planned.rawValue
 
     public var notes: String?
-    public var createdAt: Date
-    public var modifiedAt: Date
+    public var createdAt: Date = Date.now
+    public var modifiedAt: Date = Date.now
 
     /// The current status of this plan.
     ///
