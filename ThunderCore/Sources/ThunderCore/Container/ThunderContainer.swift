@@ -36,7 +36,7 @@ public enum ThunderContainer {
     /// - Throws: If the container cannot be created or the migration fails.
     ///           A throw here is unrecoverable — the app cannot function without its store.
     public static func production() throws -> ModelContainer {
-        let schema = Schema(SchemaV1.models, version: SchemaV1.versionIdentifier)
+        let schema = Schema(ThunderMigrationPlan.Current.models, version: ThunderMigrationPlan.Current.versionIdentifier)
         let config = ModelConfiguration(
             schema: schema,
             cloudKitDatabase: .private(ThunderConfiguration.cloudKitContainerIdentifier)
@@ -57,7 +57,7 @@ public enum ThunderContainer {
     ///
     /// - Throws: If the container cannot be created.
     public static func preview() throws -> ModelContainer {
-        let schema = Schema(SchemaV1.models, version: SchemaV1.versionIdentifier)
+        let schema = Schema(ThunderMigrationPlan.Current.models, version: ThunderMigrationPlan.Current.versionIdentifier)
         let config = ModelConfiguration(
             schema: schema,
             isStoredInMemoryOnly: true
@@ -79,7 +79,7 @@ public enum ThunderContainer {
     ///
     /// - Throws: If the container cannot be created.
     public static func testing() throws -> ModelContainer {
-        let schema = Schema(SchemaV1.models, version: SchemaV1.versionIdentifier)
+        let schema = Schema(ThunderMigrationPlan.Current.models, version: ThunderMigrationPlan.Current.versionIdentifier)
         let config = ModelConfiguration(
             schema: schema,
             isStoredInMemoryOnly: true
