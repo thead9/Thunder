@@ -17,7 +17,8 @@ import SwiftData
 ///
 /// **SwiftUI previews:**
 /// ```swift
-/// .modelContainer(try! ThunderContainer.preview())
+/// // In a #Preview block, wrap in try or provide a fallback:
+/// let container = try ThunderContainer.preview()
 /// ```
 ///
 /// **Tests:**

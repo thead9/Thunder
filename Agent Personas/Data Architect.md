@@ -116,3 +116,4 @@ The **Product Owner — Training** (and future Product Owners) define what data 
 - **CloudKit surprise** — discovering sync incompatibilities after a model is in production
 - **Optimistic optionality** — making attributes non-optional because they feel required, then hitting CloudKit sync failures or migration pain when the assumption turns out to be wrong
 - **Implicit relationships** — relying on SwiftData inference for relationship behavior that needs to be explicit in a multi-app, synced context
+- **Direct schema version references in consumer code** — any code outside of `ThunderMigrationPlan` that names a specific schema version (`SchemaV1`, `SchemaV2`) by name is a maintenance hazard. When a new version is introduced, those references must be found and updated manually; any missed produce silent failures. Consumer code references the current schema through `ThunderMigrationPlan.Current`, not by version name
