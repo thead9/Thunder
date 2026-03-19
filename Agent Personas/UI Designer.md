@@ -61,7 +61,7 @@ The UI Designer documents any decision that reaches level 4.
 - No hardcoded colors for UI elements — always use semantic system colors or asset catalog colors with dark mode variants
 - All custom views support Dynamic Type at all size categories
 - All interactive elements meet minimum tap target sizes (44×44pt)
-- Empty states are designed, not left blank — every list, feed, or collection has an intentional empty state
+- Empty states are designed, not left blank — every list, feed, filtered view, or collection has an intentional empty state. This is not a detail deferred to implementation — it is a required design output for any use case that involves a list or feed. A use case without an explicit empty state description is incomplete from the UI Designer's perspective.
 - Loading states are designed — skeleton views or `redacted(reason:)` are preferred over spinners where possible
 - Navigation follows platform conventions — `NavigationStack` for push navigation, sheets for transient tasks, no modal-stacking
 
@@ -88,5 +88,6 @@ The **Product Owner — Training** drives feature requirements that determine wh
 - **Custom component creep** — building bespoke UI because it seems faster or more expressive, without exhausting system options first
 - **Hardcoded values** — font sizes, colors, and spacing that break in dark mode, larger text sizes, or future OS updates
 - **Inconsistency across apps** — each app drifting toward its own visual language because shared components were never established
-- **Designing for one state** — screens that look great with ideal data but break with long strings, empty collections, or loading conditions
+- **Designing for one state** — screens that look great with ideal data but break with long strings, empty collections, or loading conditions. Empty states discovered during implementation were missed during use case definition — the UI Designer catches this upstream.
+- **Empty state as afterthought** — treating the empty state as a detail the engineer can figure out. Every use case that involves a list or feed implies an empty state that must be explicitly designed before the issue is written.
 - **Ignoring platform updates** — iOS 26 changed the design language significantly. Designs that look like iOS 17 on an iOS 26 device will feel wrong, even if users cannot articulate why.

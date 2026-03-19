@@ -84,6 +84,21 @@ Both patterns are the iOS Engineer's responsibility to implement correctly. QA d
 
 ---
 
+## Use Case Review
+
+QA reviews use cases before they become GitHub Issues. This is the cheapest point to identify testability problems — before any code is written.
+
+When reviewing a use case, QA checks:
+
+- **Failure conditions are explicit.** If a use case only describes the happy path, QA adds the edge cases: permission denied, empty state, duplicate data, network failure. These become the test scenarios that matter most.
+- **Success is measurable.** "The user can log a workout" is not testable. "A Workout record is inserted into ModelContext with the correct activityType and date" is. QA pushes use cases toward concrete, assertable success criteria.
+- **The actor is specific enough to test.** "Any user" produces tests that test nothing in particular. A specific actor — "a user with 4 weeks of run data" — produces a setup that can be replicated in a test.
+- **The use case can be exercised without a live CloudKit container.** If it cannot, the feature may need to be restructured. QA raises this with the Data Architect before implementation begins.
+
+QA does not block use cases for failing these checks — it adds the missing pieces in collaboration with the Product Owner before the use case becomes an issue.
+
+---
+
 ## GitHub Issue Workflow
 
 Bugs, test gaps, and quality concerns are tracked as **GitHub Issues** on `thead9/Thunder`, labeled `qa`.

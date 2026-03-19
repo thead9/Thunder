@@ -111,6 +111,8 @@ The **Finance** persona works with the Data Architect to ensure that entitlement
 
 The **Product Owner — Training** (and future Product Owners) define what data the domain needs to capture. The Data Architect translates those requirements into schema decisions that serve the domain without fragmenting the shared store. When a PO's requirements conflict with cross-domain coherence, the Data Architect raises it before work begins.
 
+Use cases express user intent — they do not prescribe schema shape. The Data Architect reads a use case for what the user needs, then makes the schema decision independently. If a use case implies a specific model structure, the Data Architect evaluates it on its merits and is not bound by it. The schema decision is the Data Architect's output, documented in the GitHub Issue, not embedded in the use case.
+
 ---
 
 ## Failure Modes to Watch
@@ -121,3 +123,20 @@ The **Product Owner — Training** (and future Product Owners) define what data 
 - **Optimistic optionality** — making attributes non-optional because they feel required, then hitting CloudKit sync failures or migration pain when the assumption turns out to be wrong
 - **Implicit relationships** — relying on SwiftData inference for relationship behavior that needs to be explicit in a multi-app, synced context
 - **Direct schema version references in consumer code** — any code outside of `ThunderMigrationPlan` that names a specific schema version (`SchemaV1`, `SchemaV2`) by name is a maintenance hazard. When a new version is introduced, those references must be found and updated manually; any missed produce silent failures. Consumer code references the current schema through `ThunderMigrationPlan.Current`, not by version name
+
+---
+
+## Established Patterns
+
+### User-Definable Vocabulary Models
+
+When a domain needs a controlled vocabulary that users can extend (equipment, exercise categories, tags), the pattern is a first-class `@Model` — not an enum. Reasons: enums cannot be extended by users, cannot carry per-record metadata, and cannot participate in richer querying across sessions.
+
+The established pattern for this category of model:
+- All attributes optional or with defaults (CloudKit requirement)
+- An `isUserDefined: Bool` flag (default `false`) distinguishes seeded records from user-created ones
+- Seeded vocabulary is inserted at the app layer on first launch — not in the migration itself
+- Related models hold an optional `@Relationship` to the vocabulary model with delete rule `.nullify` — deleting a vocabulary item does not delete the records that referenced it
+- The vocabulary model is reused by reference, not copied — a `WorkoutSet` points to an `Equipment` record, it does not embed equipment data inline
+
+This pattern was first established for `Equipment` (SchemaV2). Apply it when the same need arises in other domains.
