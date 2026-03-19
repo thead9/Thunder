@@ -42,6 +42,19 @@ targets:
     dependencies:
       - package: ThunderCore
 
+    # ─────────────────────────────────────────────
+    # Entitlements
+    # The container identifier must match ThunderConfiguration.cloudKitContainerIdentifier.
+    # If that constant changes, this entitlements block must be updated to match.
+    # ─────────────────────────────────────────────
+    entitlements:
+      path: Sources/Training.entitlements
+      properties:
+        com.apple.developer.icloud-container-identifiers:
+          - iCloud.com.thead9.thunder
+        com.apple.developer.icloud-services:
+          - CloudKit
+
     settings:
       base:
         # Identity

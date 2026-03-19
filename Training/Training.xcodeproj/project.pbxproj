@@ -14,6 +14,7 @@
 
 /* Begin PBXFileReference section */
 		02C33C9015C1F9FCA1CD7F9C /* Training.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Training.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1A3CF84CE4FC7536082707B7 /* Training.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Training.entitlements; sourceTree = "<group>"; };
 		355E148D2E7B3187BCF20F41 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		67B88F776F9C92F875295D86 /* TrainingApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrainingApp.swift; sourceTree = "<group>"; };
 		C7F8BA1AB22152BE4160961E /* ThunderCore */ = {isa = PBXFileReference; lastKnownFileType = folder; name = ThunderCore; path = ../ThunderCore; sourceTree = SOURCE_ROOT; };
@@ -43,6 +44,7 @@
 			isa = PBXGroup;
 			children = (
 				355E148D2E7B3187BCF20F41 /* ContentView.swift */,
+				1A3CF84CE4FC7536082707B7 /* Training.entitlements */,
 				67B88F776F9C92F875295D86 /* TrainingApp.swift */,
 			);
 			path = Sources;
@@ -197,6 +199,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Sources/Training.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = "";
@@ -221,6 +224,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Sources/Training.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = "";
