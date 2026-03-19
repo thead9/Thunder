@@ -9,14 +9,17 @@
 /* Begin PBXBuildFile section */
 		2904810BA14207B62BFCB70A /* TrainingApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67B88F776F9C92F875295D86 /* TrainingApp.swift */; };
 		5A65C86A30E9432549A86497 /* ThunderCore in Frameworks */ = {isa = PBXBuildFile; productRef = 9B6734E71D2495A56474BC4B /* ThunderCore */; };
+		921A51DCF553D7FC53574F9F /* RevenueCat in Frameworks */ = {isa = PBXBuildFile; productRef = A1793B22FE8A07D8F169F2D1 /* RevenueCat */; };
 		B1C273FCDD80850333F607F9 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 355E148D2E7B3187BCF20F41 /* ContentView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		02C33C9015C1F9FCA1CD7F9C /* Training.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Training.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		12FB60DB10196E785092EF60 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		1A3CF84CE4FC7536082707B7 /* Training.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Training.entitlements; sourceTree = "<group>"; };
 		355E148D2E7B3187BCF20F41 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		67B88F776F9C92F875295D86 /* TrainingApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrainingApp.swift; sourceTree = "<group>"; };
+		68BADCDCD223E59FADD637D5 /* Secrets.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Secrets.xcconfig; sourceTree = "<group>"; };
 		C7F8BA1AB22152BE4160961E /* ThunderCore */ = {isa = PBXFileReference; lastKnownFileType = folder; name = ThunderCore; path = ../ThunderCore; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
@@ -26,6 +29,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5A65C86A30E9432549A86497 /* ThunderCore in Frameworks */,
+				921A51DCF553D7FC53574F9F /* RevenueCat in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -44,6 +48,7 @@
 			isa = PBXGroup;
 			children = (
 				355E148D2E7B3187BCF20F41 /* ContentView.swift */,
+				12FB60DB10196E785092EF60 /* Info.plist */,
 				1A3CF84CE4FC7536082707B7 /* Training.entitlements */,
 				67B88F776F9C92F875295D86 /* TrainingApp.swift */,
 			);
@@ -63,8 +68,18 @@
 			children = (
 				B149B62AD0B9D265A35AA87D /* Packages */,
 				AC138D8B2E4E582ED903FDBD /* Sources */,
+				E744D05A6F17926955A62E22 /* Thunder */,
 				1F075F0DF15A55FF3B56AACA /* Products */,
 			);
+			sourceTree = "<group>";
+		};
+		E744D05A6F17926955A62E22 /* Thunder */ = {
+			isa = PBXGroup;
+			children = (
+				68BADCDCD223E59FADD637D5 /* Secrets.xcconfig */,
+			);
+			name = Thunder;
+			path = ..;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -84,6 +99,7 @@
 			name = Training;
 			packageProductDependencies = (
 				9B6734E71D2495A56474BC4B /* ThunderCore */,
+				A1793B22FE8A07D8F169F2D1 /* RevenueCat */,
 			);
 			productName = Training;
 			productReference = 02C33C9015C1F9FCA1CD7F9C /* Training.app */;
@@ -114,6 +130,7 @@
 			mainGroup = CD659A4A3C871F9F1446BEC7;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
+				9F7BC81E0862B4C3214FCE57 /* XCRemoteSwiftPackageReference "purchases-ios" */,
 				EA0EFC493B7012352D194252 /* XCLocalSwiftPackageReference "../ThunderCore" */,
 			);
 			preferredProjectObjectVersion = 77;
@@ -141,6 +158,7 @@
 /* Begin XCBuildConfiguration section */
 		0A792ABC923B7A88933D13AE /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 68BADCDCD223E59FADD637D5 /* Secrets.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -203,10 +221,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = "";
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = Training;
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_FILE = Sources/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -228,10 +243,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = "";
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = Training;
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_FILE = Sources/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -247,6 +259,7 @@
 		};
 		BB24FBEFC7C942EC134DAAF0 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 68BADCDCD223E59FADD637D5 /* Secrets.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -338,10 +351,26 @@
 		};
 /* End XCLocalSwiftPackageReference section */
 
+/* Begin XCRemoteSwiftPackageReference section */
+		9F7BC81E0862B4C3214FCE57 /* XCRemoteSwiftPackageReference "purchases-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/RevenueCat/purchases-ios";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
 /* Begin XCSwiftPackageProductDependency section */
 		9B6734E71D2495A56474BC4B /* ThunderCore */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = ThunderCore;
+		};
+		A1793B22FE8A07D8F169F2D1 /* RevenueCat */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9F7BC81E0862B4C3214FCE57 /* XCRemoteSwiftPackageReference "purchases-ios" */;
+			productName = RevenueCat;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
