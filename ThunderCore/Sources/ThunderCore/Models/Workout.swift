@@ -25,12 +25,7 @@ public final class Workout {
     public var duration: TimeInterval?
     public var activityType: String
     public var notes: String?
-
-    /// Raw `String` backing for `WorkoutSource`.
-    ///
-    /// SwiftData / CloudKit does not natively persist enums, so the source is
-    /// stored as its raw value and projected through the computed `source` property.
-    public var sourceRawValue: String
+    public var source: WorkoutSource
 
     /// The UUID of the correlated `HKWorkout`, if one exists.
     ///
@@ -39,15 +34,6 @@ public final class Workout {
     public var healthKitID: UUID?
     public var createdAt: Date
     public var modifiedAt: Date
-
-    /// The origin of this workout entry.
-    ///
-    /// A computed property over `sourceRawValue`. The raw value is what is actually
-    /// persisted; this property is the type-safe interface for callers.
-    public var source: WorkoutSource {
-        get { WorkoutSource(rawValue: sourceRawValue) ?? .manual }
-        set { sourceRawValue = newValue.rawValue }
-    }
 
     public init(
         id: UUID = UUID(),
@@ -65,7 +51,7 @@ public final class Workout {
         self.duration = duration
         self.activityType = activityType
         self.notes = notes
-        self.sourceRawValue = source.rawValue
+        self.source = source
         self.healthKitID = healthKitID
         self.createdAt = createdAt
         self.modifiedAt = modifiedAt

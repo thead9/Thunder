@@ -35,7 +35,6 @@ struct WorkoutDefaultsTests {
 
         #expect(workout.activityType == "")
         #expect(workout.source == .manual)
-        #expect(workout.sourceRawValue == "manual")
         #expect(workout.duration == nil)
         #expect(workout.notes == nil)
         #expect(workout.healthKitID == nil)
@@ -44,14 +43,12 @@ struct WorkoutDefaultsTests {
         #expect(workout.modifiedAt >= before && workout.modifiedAt <= after)
     }
 
-    @Test("source computed property reflects sourceRawValue")
-    func sourceProjection() {
+    @Test("source round-trips through assignment")
+    func sourceAssignment() {
         let workout = Workout(source: .healthKit)
-        #expect(workout.sourceRawValue == "healthKit")
         #expect(workout.source == .healthKit)
 
         workout.source = .manual
-        #expect(workout.sourceRawValue == "manual")
         #expect(workout.source == .manual)
     }
 }
@@ -91,7 +88,7 @@ struct WorkoutPersistenceTests {
         #expect(w.duration == 3600)
         #expect(w.activityType == "Strength")
         #expect(w.notes == "Felt strong")
-        #expect(w.sourceRawValue == "healthKit")
+        #expect(w.source == .healthKit)
         #expect(w.healthKitID == hkID)
         #expect(w.createdAt == created)
         #expect(w.modifiedAt == modified)
