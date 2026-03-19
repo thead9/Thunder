@@ -115,7 +115,7 @@
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
 					18F6C878EF626BA5B3598160 = {
-						DevelopmentTeam = "";
+						DevelopmentTeam = X94L6WV9DW;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -130,7 +130,7 @@
 			mainGroup = CD659A4A3C871F9F1446BEC7;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				9F7BC81E0862B4C3214FCE57 /* XCRemoteSwiftPackageReference "purchases-ios" */,
+				990E117E3B8B130DC560E2A9 /* XCRemoteSwiftPackageReference "purchases-ios-spm" */,
 				EA0EFC493B7012352D194252 /* XCLocalSwiftPackageReference "../ThunderCore" */,
 			);
 			preferredProjectObjectVersion = 77;
@@ -220,7 +220,6 @@
 				CODE_SIGN_ENTITLEMENTS = Sources/Training.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = Sources/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -242,7 +241,6 @@
 				CODE_SIGN_ENTITLEMENTS = Sources/Training.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = Sources/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -352,9 +350,9 @@
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		9F7BC81E0862B4C3214FCE57 /* XCRemoteSwiftPackageReference "purchases-ios" */ = {
+		990E117E3B8B130DC560E2A9 /* XCRemoteSwiftPackageReference "purchases-ios-spm" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/RevenueCat/purchases-ios";
+			repositoryURL = "https://github.com/RevenueCat/purchases-ios-spm";
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 5.0.0;
@@ -369,7 +367,7 @@
 		};
 		A1793B22FE8A07D8F169F2D1 /* RevenueCat */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 9F7BC81E0862B4C3214FCE57 /* XCRemoteSwiftPackageReference "purchases-ios" */;
+			package = 990E117E3B8B130DC560E2A9 /* XCRemoteSwiftPackageReference "purchases-ios-spm" */;
 			productName = RevenueCat;
 		};
 /* End XCSwiftPackageProductDependency section */
