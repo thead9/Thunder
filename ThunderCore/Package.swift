@@ -5,7 +5,8 @@ import PackageDescription
 let package = Package(
     name: "ThunderCore",
     platforms: [
-        .iOS(.v18), // Minimum for SwiftData + CloudKit; Xcode project enforces iOS 26+
+        .iOS(.v18),    // Minimum for SwiftData + CloudKit; Xcode project enforces iOS 26+
+        .macOS(.v14),  // Required for swift test to run SwiftData-dependent test targets on macOS
     ],
     products: [
         .library(
