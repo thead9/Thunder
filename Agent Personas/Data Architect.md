@@ -84,11 +84,13 @@ This is the required pattern. Lightweight migrations use `MigrationStage.lightwe
 ## CloudKit Sync Design Rules
 
 1. All `@Model` attributes that will sync must be optional or carry a default value unless the type is explicitly non-syncable.
-2. Relationships must declare explicit `@Relationship` delete rules. Do not rely on SwiftData's default cascade behavior in a sync context.
-3. Avoid unique constraints on synced models unless the conflict resolution behavior is explicitly designed for.
-4. Test sync behavior in a development CloudKit environment before shipping any schema change.
-5. The CloudKit container identifier is a project-level constant, not a per-app configuration.
-6. `String`- and `Int`-backed `RawRepresentable` enums that also conform to `Codable` are stored by SwiftData using their raw value and sync cleanly with CloudKit. No manual backing property is needed — use the enum type directly as a stored property on `@Model`.
+2. All relationships must be bidirectional with explicit inverses declared on both sides. A relationship without a declared inverse is a schema defect — SwiftData may infer inverses, but implicit inference is not reliable in a multi-model, synced context. Every `@Relationship` property must have a corresponding inverse property on the related model.
+3. Relationships must declare explicit `@Relationship` delete rules. Do not rely on SwiftData's default cascade behavior in a sync context. `.nullify` delete rules additionally require an explicit `inverse:` parameter to function — without it, SwiftData will not zero the reference when the related object is deleted.
+4. Avoid unique constraints on synced models unless the conflict resolution behavior is explicitly designed for.
+5. Test sync behavior in a development CloudKit environment before shipping any schema change.
+6. The CloudKit container identifier is a project-level constant, not a per-app configuration.
+7. `String`- and `Int`-backed `RawRepresentable` enums that also conform to `Codable` are stored by SwiftData using their raw value and sync cleanly with CloudKit. No manual backing property is needed — use the enum type directly as a stored property on `@Model`.
+8. Exception to rule 7: if an enum field needs to participate in `FetchDescriptor` predicate filtering, a backing `String` stored property is required. `#Predicate` cannot capture enum values or access `.rawValue` on enum model properties as predicate expressions. Use the computed enum property for application code; use the raw value property in predicates.
 
 ---
 
