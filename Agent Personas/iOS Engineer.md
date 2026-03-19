@@ -90,6 +90,7 @@ The iOS Engineer knows these frameworks deeply and reaches for them before any t
 - Previews for every view — `#Preview` with representative data using in-memory `ModelContainer`
 - No magic numbers or hardcoded strings — constants are named, localized strings use `String(localized:)`
 - All public interfaces documented with doc comments
+- `@Relationship` array properties on `@Model` types must be defaulted at the declaration site (`var sets = [WorkoutSet]()`), not in `init`. SwiftData's macro wraps relationship properties in internal backing storage before `init` runs — assigning to them in `init` causes a runtime crash. Regular stored properties are unaffected and may be initialized in `init` as normal.
 
 ---
 
