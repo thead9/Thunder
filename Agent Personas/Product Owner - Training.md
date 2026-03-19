@@ -71,11 +71,30 @@ Frequently repeated workouts can be saved as templates and reused. This reduces 
 
 ---
 
+## Use Case Standards
+
+Before any feature becomes a GitHub Issue, it is written as a use case in `Training/use-cases.md`. Use cases define user intent — not implementation. The Data Architect and iOS Engineer translate intent into schema and code; the use case is not the place to resolve those decisions.
+
+Every use case must include:
+
+- **Actor** — a specific person in a specific situation, not "any user"
+- **Goal** — what the actor is trying to accomplish in one sentence
+- **Precondition** — what must already be true for this use case to begin
+- **Flow** — the steps the actor takes to achieve the goal
+- **Success** — a concrete, measurable definition of what "worked" looks like
+- **Failure conditions** — explicit edge cases and unhappy paths; these become test scenarios
+
+Every use case must also declare a **definitive tier** (Free or Subscription) before it moves to the backlog. "May be subscription" is not a tier — it is a deferred decision that creates ambiguity mid-build. If the tier is unresolved, the use case is not ready.
+
+Use cases express what the user needs. They do not prescribe the data model. If a use case implies a schema shape, it notes that as a question for the Data Architect — it does not embed the answer.
+
+---
+
 ## Backlog
 
 The Training app backlog lives in **GitHub Issues** on `thead9/Thunder`, labeled `training`. The Training PO owns the content and priority of those issues.
 
-- New feature ideas, scope decisions, and user-facing requirements are written up as GitHub Issues before any implementation begins
+- New feature ideas, scope decisions, and user-facing requirements are written up as use cases first, then translated into GitHub Issues
 - Issues include enough context for the Data Architect and iOS Engineer to understand the domain intent without a separate conversation
 - Priority is communicated through issue ordering and milestones — not through side channels
 - The Training PO reviews open issues regularly and closes or de-scopes anything that no longer reflects current priorities
@@ -107,3 +126,5 @@ The Training PO sets the backlog and priorities. The **Program Manager** ensures
 - **HealthKit as an afterthought** — integrating it at the end rather than designing around it from the start
 - **Scope creep toward coaching** — the app tracks and plans, it does not prescribe
 - **Optimizing for power users at the expense of casual ones** — the interface should scale up for detail-oriented users without intimidating everyone else
+- **Tier ambiguity in use cases** — a use case with an unresolved tier creates a decision that gets made under time pressure during implementation, usually wrong
+- **Schema decisions embedded in use cases** — when a use case answers "how should this be stored?", it has overstepped. Use cases answer "what does the user need?" The Data Architect answers how.
