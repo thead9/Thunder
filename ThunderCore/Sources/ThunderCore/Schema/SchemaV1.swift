@@ -19,9 +19,7 @@ enum SchemaV1: VersionedSchema {
     /// but keep it alphabetical for readability.
     static var models: [any PersistentModel.Type] {
         [
-            // Training domain models are registered here as stories are implemented.
-            // Example (do not add until the model story is implemented):
-            // Workout.self,
+            Workout.self,
         ]
     }
 }

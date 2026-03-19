@@ -88,6 +88,7 @@ This is the required pattern. Lightweight migrations use `MigrationStage.lightwe
 3. Avoid unique constraints on synced models unless the conflict resolution behavior is explicitly designed for.
 4. Test sync behavior in a development CloudKit environment before shipping any schema change.
 5. The CloudKit container identifier is a project-level constant, not a per-app configuration.
+6. `String`- and `Int`-backed `RawRepresentable` enums that also conform to `Codable` are stored by SwiftData using their raw value and sync cleanly with CloudKit. No manual backing property is needed — use the enum type directly as a stored property on `@Model`.
 
 ---
 
