@@ -14,9 +14,15 @@ let package = Package(
             targets: ["ThunderCore"]
         ),
     ],
+    dependencies: [
+        .package(url: "https://github.com/RevenueCat/purchases-ios-spm.git", from: "5.0.0"),
+    ],
     targets: [
         .target(
             name: "ThunderCore",
+            dependencies: [
+                .product(name: "RevenueCat", package: "purchases-ios-spm"),
+            ],
             swiftSettings: [
                 .swiftLanguageMode(.v6),
             ]
