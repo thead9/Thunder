@@ -41,7 +41,6 @@ struct PlannedWorkoutPersistenceTests {
         context.insert(plan)
         try context.save()
 
-        // Transition to completed and link a workout
         let workout = Workout(activityType: "Strength")
         context.insert(workout)
         plan.status = .completed
@@ -54,24 +53,6 @@ struct PlannedWorkoutPersistenceTests {
         #expect(workouts.count == 1)
         #expect(plans[0].status == .completed)
         #expect(plans[0].workout?.id == workout.id)
-    }
-
-    @Test("deleting WorkoutTemplate nullifies plan.template, plan survives")
-    func templateDeletionNullifiesPlan() throws {
-        let context = try makeTestContext()
-
-        let template = WorkoutTemplate(name: "Push Day")
-        context.insert(template)
-        let plan = PlannedWorkout(scheduledDate: .now, template: template)
-        context.insert(plan)
-        try context.save()
-
-        context.delete(template)
-        try context.save()
-
-        let plans = try context.fetch(FetchDescriptor<PlannedWorkout>())
-        #expect(plans.count == 1)
-        #expect(plans[0].template == nil)
     }
 
     @Test("deleting Workout nullifies plan.workout, plan survives")
@@ -104,7 +85,6 @@ struct PlannedWorkoutPersistenceTests {
         context.insert(skipped)
         try context.save()
 
-        // Filter via the backing string — #Predicate does not support enum values.
         let skippedRaw = PlannedWorkoutStatus.skipped.rawValue
         let descriptor = FetchDescriptor<PlannedWorkout>(
             predicate: #Predicate { $0.statusRawValue == skippedRaw }

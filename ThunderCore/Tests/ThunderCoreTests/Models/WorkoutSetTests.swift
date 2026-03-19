@@ -46,12 +46,14 @@ struct WorkoutSetPersistenceTests {
         context.insert(set0)
         context.insert(set1)
         context.insert(set2)
-        workout.sets.append(contentsOf: [set0, set1, set2])
+        set0.workout = workout
+        set1.workout = workout
+        set2.workout = workout
         try context.save()
 
         let fetchedWorkouts = try context.fetch(FetchDescriptor<Workout>())
         let fetchedWorkout = try #require(fetchedWorkouts.first)
-        let sortedSets = fetchedWorkout.sets.sorted { $0.setIndex < $1.setIndex }
+        let sortedSets = (fetchedWorkout.sets ?? []).sorted { $0.setIndex < $1.setIndex }
 
         #expect(sortedSets.count == 3)
         #expect(sortedSets[0].exerciseName == "Squat")
@@ -71,7 +73,8 @@ struct WorkoutSetPersistenceTests {
         let set1 = WorkoutSet(exerciseName: "Bench", setIndex: 1)
         context.insert(set0)
         context.insert(set1)
-        workout.sets.append(contentsOf: [set0, set1])
+        set0.workout = workout
+        set1.workout = workout
         try context.save()
 
         context.delete(workout)
@@ -96,18 +99,17 @@ struct WorkoutSetPersistenceTests {
         context.insert(setA0)
         context.insert(setA1)
         context.insert(setB0)
-        workoutA.sets.append(contentsOf: [setA0, setA1])
-        workoutB.sets.append(setB0)
+        setA0.workout = workoutA
+        setA1.workout = workoutA
+        setB0.workout = workoutB
         try context.save()
 
-        // Accessing sets through the relationship is the idiomatic SwiftData pattern.
-        // #Predicate does not support optional-chain comparisons on relationship keys.
         let fetchedWorkouts = try context.fetch(FetchDescriptor<Workout>())
         let fetchedA = try #require(fetchedWorkouts.first { $0.activityType == "Push" })
         let fetchedB = try #require(fetchedWorkouts.first { $0.activityType == "Pull" })
 
-        let setsForA = fetchedA.sets.sorted { $0.setIndex < $1.setIndex }
-        let setsForB = fetchedB.sets.sorted { $0.setIndex < $1.setIndex }
+        let setsForA = (fetchedA.sets ?? []).sorted { $0.setIndex < $1.setIndex }
+        let setsForB = (fetchedB.sets ?? []).sorted { $0.setIndex < $1.setIndex }
 
         #expect(setsForA.count == 2)
         #expect(setsForA[0].exerciseName == "Bench")
