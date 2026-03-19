@@ -27,6 +27,13 @@ public final class Workout {
     public var notes: String?
     public var source: WorkoutSource
 
+    /// The sets logged within this workout, in no guaranteed order.
+    ///
+    /// Sort by `setIndex` when displaying. Delete rule is `.cascade` — all
+    /// associated `WorkoutSet` records are deleted when this workout is deleted.
+    @Relationship(deleteRule: .cascade)
+    public var sets = [WorkoutSet]()
+
     /// The UUID of the correlated `HKWorkout`, if one exists.
     ///
     /// Populated by the HealthKit service (BIZ-2). `nil` for manually entered workouts
