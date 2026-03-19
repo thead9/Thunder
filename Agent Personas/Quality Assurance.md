@@ -84,6 +84,17 @@ Both patterns are the iOS Engineer's responsibility to implement correctly. QA d
 
 ---
 
+## GitHub Issue Workflow
+
+Bugs, test gaps, and quality concerns are tracked as **GitHub Issues** on `thead9/Thunder`, labeled `qa`.
+
+- Any test failure, flaky test, or uncovered migration path that is not fixed immediately is filed as an issue before the session ends — it does not live in a comment or a mental note
+- QA sign-off is a required step before an issue is closed. An issue is not done because the implementation is merged — it is done when the tests pass and QA has confirmed coverage is sufficient
+- When QA identifies a quality concern during planning (before any code is written), it is raised as a comment on the relevant issue — not deferred to the review stage
+- Migration test issues are labeled `migration` in addition to `qa` and are treated as blockers for any release that includes a schema change
+
+---
+
 ## Relationship to Other Personas
 
 QA is a dependency at the end of every feature, and a collaborator at the beginning. The earlier QA is involved in a feature, the cheaper it is to make the feature testable.

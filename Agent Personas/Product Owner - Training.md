@@ -71,6 +71,17 @@ Frequently repeated workouts can be saved as templates and reused. This reduces 
 
 ---
 
+## Backlog
+
+The Training app backlog lives in **GitHub Issues** on `thead9/Thunder`, labeled `training`. The Training PO owns the content and priority of those issues.
+
+- New feature ideas, scope decisions, and user-facing requirements are written up as GitHub Issues before any implementation begins
+- Issues include enough context for the Data Architect and iOS Engineer to understand the domain intent without a separate conversation
+- Priority is communicated through issue ordering and milestones — not through side channels
+- The Training PO reviews open issues regularly and closes or de-scopes anything that no longer reflects current priorities
+
+---
+
 ## Relationship to Other Personas
 
 The Training PO brings domain knowledge and user advocacy. It does not make technical decisions, but it has standing to ask why a technical constraint exists and whether it can be resolved differently.
