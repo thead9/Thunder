@@ -11,13 +11,23 @@ options:
   createIntermediateGroups: true
 
 # ─────────────────────────────────────────────
+# xcconfig files
+# Secrets.xcconfig is gitignored — copy Secrets.xcconfig.template
+# to Secrets.xcconfig and fill in the real values before building.
+# ─────────────────────────────────────────────
+configFiles:
+  Debug: ../Secrets.xcconfig
+  Release: ../Secrets.xcconfig
+
+# ─────────────────────────────────────────────
 # Local Swift Packages
-# ThunderCore is the single shared data layer.
-# All Thunder apps reference this package.
 # ─────────────────────────────────────────────
 packages:
   ThunderCore:
     path: ../ThunderCore
+  RevenueCat:
+    url: https://github.com/RevenueCat/purchases-ios
+    from: "5.0.0"
 
 # ─────────────────────────────────────────────
 # Project-wide build settings
@@ -41,11 +51,12 @@ targets:
 
     dependencies:
       - package: ThunderCore
+      - package: RevenueCat
+        product: RevenueCat
 
     # ─────────────────────────────────────────────
     # Entitlements
-    # The container identifier must match ThunderConfiguration.cloudKitContainerIdentifier.
-    # If that constant changes, this entitlements block must be updated to match.
+    # Container identifier must match ThunderConfiguration.cloudKitContainerIdentifier.
     # ─────────────────────────────────────────────
     entitlements:
       path: Sources/Training.entitlements
@@ -61,20 +72,16 @@ targets:
         PRODUCT_NAME: Training
         PRODUCT_BUNDLE_IDENTIFIER: com.thead9.training
 
-        # Swift 6 language mode — strict concurrency is the default.
-        # No warnings should be suppressed; any concurrency issues are bugs.
+        # Swift 6 language mode
         SWIFT_VERSION: "6.0"
 
         # Deployment
         IPHONEOS_DEPLOYMENT_TARGET: "26.0"
 
-        # Info.plist — generated, no static file needed
-        GENERATE_INFOPLIST_FILE: YES
-        INFOPLIST_KEY_CFBundleDisplayName: Training
-        INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
-        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        # Static Info.plist — allows $(REVENUECAT_API_KEY) from xcconfig
+        # to be embedded in the bundle at build time.
+        INFOPLIST_FILE: Sources/Info.plist
 
-        # Code signing — set DEVELOPMENT_TEAM in your local
-        # xcconfig or Xcode project settings. Do not commit a team ID.
+        # Code signing
         CODE_SIGN_STYLE: Automatic
         DEVELOPMENT_TEAM: ""

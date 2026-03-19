@@ -55,6 +55,7 @@ fastlane/README.md
 *.provisionprofile
 AuthKey_*.p8
 GoogleService-Info.plist
+Secrets.xcconfig
 secrets.xcconfig
 *.env
 .env.*
