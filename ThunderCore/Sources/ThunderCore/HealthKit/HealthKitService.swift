@@ -75,13 +75,19 @@ public actor HealthKitService {
     /// - Returns: The UUID of the newly created `HKWorkout`.
     /// - Throws: An `HKError` if the HealthKit save fails.
     public func write(date: Date, duration: TimeInterval?, activityType: String) async throws -> UUID {
-        let hkType = hkActivityType(for: activityType)
+        let config = HKWorkoutConfiguration()
+        config.activityType = hkActivityType(for: activityType)
+
         let start = date
         let end = duration.map { start.addingTimeInterval($0) } ?? start
 
-        let hkWorkout = HKWorkout(activityType: hkType, start: start, end: end)
-        try await store.save(hkWorkout)
-        return hkWorkout.uuid
+        let builder = HKWorkoutBuilder(healthStore: store, configuration: config, device: .local())
+        try await builder.beginCollection(at: start)
+        try await builder.endCollection(at: end)
+        guard let workout = try await builder.finishWorkout() else {
+            throw HKError(.errorInvalidArgument)
+        }
+        return workout.uuid
     }
 
     // MARK: - Import
@@ -157,7 +163,7 @@ public actor HealthKitService {
         case "elliptical":                   return .elliptical
         case "stairclimbing", "stairs":      return .stairClimbing
         case "crossfit":                     return .crossTraining
-        case "dance":                        return .dance
+        case "dance":                        return .cardioDance
         case "soccer", "football":           return .soccer
         case "basketball":                   return .basketball
         case "tennis":                       return .tennis
@@ -189,7 +195,7 @@ extension HKWorkoutActivityType {
         case .elliptical:                     return "Elliptical"
         case .stairClimbing:                  return "Stair Climbing"
         case .crossTraining:                  return "CrossFit"
-        case .dance:                          return "Dance"
+        case .cardioDance, .socialDance:      return "Dance"
         case .soccer:                         return "Soccer"
         case .basketball:                     return "Basketball"
         case .tennis:                         return "Tennis"

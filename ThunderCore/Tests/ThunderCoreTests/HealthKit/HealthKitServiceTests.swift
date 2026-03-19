@@ -92,7 +92,7 @@ struct HealthKitServiceActivityTypeMappingTests {
     @Test("dance maps correctly")
     func danceMapping() async {
         let result = await service.hkActivityType(for: "dance")
-        #expect(result == .dance)
+        #expect(result == .cardioDance)
     }
 
     @Test("soccer/football maps correctly", arguments: ["soccer", "football"])
@@ -203,9 +203,14 @@ struct ThunderActivityTypeTests {
         #expect(HKWorkoutActivityType.crossTraining.thunderActivityType == "CrossFit")
     }
 
-    @Test("dance reverse maps to Dance")
-    func danceReverseMap() {
-        #expect(HKWorkoutActivityType.dance.thunderActivityType == "Dance")
+    @Test("cardioDance reverse maps to Dance")
+    func cardioDanceReverseMap() {
+        #expect(HKWorkoutActivityType.cardioDance.thunderActivityType == "Dance")
+    }
+
+    @Test("socialDance reverse maps to Dance")
+    func socialDanceReverseMap() {
+        #expect(HKWorkoutActivityType.socialDance.thunderActivityType == "Dance")
     }
 
     @Test("soccer reverse maps to Soccer")
