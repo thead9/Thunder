@@ -35,6 +35,15 @@ All work on this project is guided by the Agent Personas defined in `/Agent Pers
 - **Finance** — RevenueCat, ethical monetization, free tier viability, no dark patterns
 - **Product Owner — Training** — workout tracking and planning, fast logging, HealthKit integration
 
+## Development Setup
+
+Required before building for the first time in any session:
+
+1. **Secrets.xcconfig** — copy `Secrets.xcconfig.template` → `Secrets.xcconfig` and fill in the RevenueCat API key. This file is gitignored and never committed.
+2. **xcodegen** — required to regenerate `Training/Training.xcodeproj` after any change to `Training/project.yml`. Install via `brew install xcodegen`, then run `xcodegen generate` from `Training/`.
+
+ThunderCore tests run via `swift test` in `ThunderCore/`. The workspace build runs via `xcodebuild` or by opening `Thunder.xcworkspace` in Xcode.
+
 ## Behavioral Instructions
 
 - Always apply the relevant personas when proposing or implementing anything

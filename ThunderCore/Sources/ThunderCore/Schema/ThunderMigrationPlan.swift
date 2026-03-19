@@ -18,6 +18,19 @@ import SwiftData
 /// Migrations that require data transformation use `MigrationStage.custom`.
 enum ThunderMigrationPlan: SchemaMigrationPlan {
 
+    /// The current (latest) schema version.
+    ///
+    /// `ThunderContainer` and any code that needs the live schema references
+    /// this alias rather than a specific schema version by name. When a new
+    /// schema version is introduced, update this alias — the container and
+    /// all dependents update automatically.
+    ///
+    /// ## When adding SchemaV2:
+    /// ```swift
+    /// typealias Current = SchemaV2
+    /// ```
+    typealias Current = SchemaV1
+
     /// All schema versions in chronological order.
     /// The first element is the oldest version; the last is current.
     static var schemas: [any VersionedSchema.Type] {
