@@ -1,0 +1,67 @@
+name: Training
+
+# ─────────────────────────────────────────────
+# Project-wide options
+# ─────────────────────────────────────────────
+options:
+  bundleIdPrefix: com.thead9
+  deploymentTarget:
+    iOS: "26.0"
+  groupSortPosition: none
+  createIntermediateGroups: true
+
+# ─────────────────────────────────────────────
+# Local Swift Packages
+# ThunderCore is the single shared data layer.
+# All Thunder apps reference this package.
+# ─────────────────────────────────────────────
+packages:
+  ThunderCore:
+    path: ../ThunderCore
+
+# ─────────────────────────────────────────────
+# Project-wide build settings
+# ─────────────────────────────────────────────
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    IPHONEOS_DEPLOYMENT_TARGET: "26.0"
+
+# ─────────────────────────────────────────────
+# Targets
+# ─────────────────────────────────────────────
+targets:
+  Training:
+    type: application
+    platform: iOS
+    deploymentTarget: "26.0"
+
+    sources:
+      - path: Sources
+
+    dependencies:
+      - package: ThunderCore
+
+    settings:
+      base:
+        # Identity
+        PRODUCT_NAME: Training
+        PRODUCT_BUNDLE_IDENTIFIER: com.thead9.training
+
+        # Swift 6 language mode — strict concurrency is the default.
+        # No warnings should be suppressed; any concurrency issues are bugs.
+        SWIFT_VERSION: "6.0"
+
+        # Deployment
+        IPHONEOS_DEPLOYMENT_TARGET: "26.0"
+
+        # Info.plist — generated, no static file needed
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: Training
+        INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+
+        # Code signing — set DEVELOPMENT_TEAM in your local
+        # xcconfig or Xcode project settings. Do not commit a team ID.
+        CODE_SIGN_STYLE: Automatic
+        DEVELOPMENT_TEAM: ""
