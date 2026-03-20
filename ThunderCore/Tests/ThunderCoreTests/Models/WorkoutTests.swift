@@ -47,9 +47,15 @@ struct WorkoutDefaultsTests {
     func sourceAssignment() {
         let workout = Workout(source: .healthKit)
         #expect(workout.source == .healthKit)
-
         workout.source = .manual
         #expect(workout.source == .manual)
+    }
+
+    @Test("entries and template default to nil")
+    func relationshipDefaults() {
+        let workout = Workout()
+        #expect((workout.entries ?? []).isEmpty)
+        #expect(workout.template == nil)
     }
 }
 

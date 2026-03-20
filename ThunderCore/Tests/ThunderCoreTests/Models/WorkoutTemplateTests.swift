@@ -15,106 +15,91 @@ struct WorkoutTemplateDefaultsTests {
 
     @Test("notes defaults to nil")
     func notesDefault() {
-        let template = WorkoutTemplate()
-        #expect(template.notes == nil)
+        #expect(WorkoutTemplate().notes == nil)
     }
 
-    @Test("sets defaults to nil (no sets)")
-    func setsDefault() {
-        let template = WorkoutTemplate()
-        #expect((template.sets ?? []).isEmpty)
+    @Test("entries defaults to nil")
+    func entriesDefault() {
+        #expect((WorkoutTemplate().entries ?? []).isEmpty)
     }
 }
 
-@Suite("TemplateSet — default field values")
-struct TemplateSetDefaultsTests {
+@Suite("TemplateEntry — default field values")
+struct TemplateEntryDefaultsTests {
 
-    @Test("setIndex defaults to 0")
-    func setIndexDefault() {
-        let set = TemplateSet()
-        #expect(set.setIndex == 0)
-    }
-
-    @Test("exerciseName defaults to empty string")
-    func exerciseNameDefault() {
-        let set = TemplateSet()
-        #expect(set.exerciseName == "")
-    }
-
-    @Test("all optional target fields default to nil")
-    func optionalFieldsNil() {
-        let set = TemplateSet()
-        #expect(set.targetReps == nil)
-        #expect(set.targetWeightKg == nil)
-        #expect(set.targetDistanceMeters == nil)
-        #expect(set.targetDurationSeconds == nil)
-        #expect(set.notes == nil)
-        #expect(set.template == nil)
+    @Test("all defaults correct on init")
+    func defaults() {
+        let entry = TemplateEntry()
+        #expect(entry.entryIndex == 0)
+        #expect(entry.groupIndex == nil)
+        #expect(entry.exerciseName == "")
+        #expect(entry.entryType == .set)
+        #expect(entry.targetReps == nil)
+        #expect(entry.targetWeightKg == nil)
+        #expect(entry.targetDistanceMeters == nil)
+        #expect(entry.targetDurationSeconds == nil)
+        #expect(entry.targetRestDurationSeconds == nil)
+        #expect(entry.notes == nil)
+        #expect(entry.template == nil)
+        #expect(entry.equipment == nil)
     }
 }
 
 @Suite("WorkoutTemplate — persistence")
 struct WorkoutTemplatePersistenceTests {
 
-    @Test("sets are accessible via WorkoutTemplate.sets relationship")
-    func setsViaRelationship() throws {
+    @Test("entries accessible via WorkoutTemplate.entries relationship")
+    func entriesViaRelationship() throws {
         let context = try makeTestContext()
 
         let template = WorkoutTemplate(name: "Push Day", activityType: "Strength")
         context.insert(template)
 
-        let set0 = TemplateSet(exerciseName: "Bench Press", setIndex: 0, targetReps: 5, targetWeightKg: 80)
-        let set1 = TemplateSet(exerciseName: "Bench Press", setIndex: 1, targetReps: 5, targetWeightKg: 85)
-        let set2 = TemplateSet(exerciseName: "Overhead Press", setIndex: 2, targetReps: 8, targetWeightKg: 50)
-        context.insert(set0)
-        context.insert(set1)
-        context.insert(set2)
-        set0.template = template
-        set1.template = template
-        set2.template = template
+        let e0 = TemplateEntry(entryIndex: 0, groupIndex: 0, exerciseName: "Bench Press", entryType: .set, targetReps: 5, targetWeightKg: 80)
+        let e1 = TemplateEntry(entryIndex: 1, groupIndex: 0, exerciseName: "Bench Press", entryType: .set, targetReps: 5, targetWeightKg: 85)
+        let e2 = TemplateEntry(entryIndex: 2, groupIndex: 1, exerciseName: "Overhead Press", entryType: .set, targetReps: 8, targetWeightKg: 50)
+        e0.template = template
+        e1.template = template
+        e2.template = template
+        context.insert(e0); context.insert(e1); context.insert(e2)
         try context.save()
 
         let fetched = try context.fetch(FetchDescriptor<WorkoutTemplate>())
-        let fetchedTemplate = try #require(fetched.first)
-        let sortedSets = (fetchedTemplate.sets ?? []).sorted { $0.setIndex < $1.setIndex }
+        let t = try #require(fetched.first)
+        let sorted = (t.entries ?? []).sorted { $0.entryIndex < $1.entryIndex }
 
-        #expect(sortedSets.count == 3)
-        #expect(sortedSets[0].exerciseName == "Bench Press")
-        #expect(sortedSets[0].targetWeightKg == 80)
-        #expect(sortedSets[1].targetWeightKg == 85)
-        #expect(sortedSets[2].exerciseName == "Overhead Press")
+        #expect(sorted.count == 3)
+        #expect(sorted[0].exerciseName == "Bench Press")
+        #expect(sorted[0].groupIndex == 0)
+        #expect(sorted[1].targetWeightKg == 85)
+        #expect(sorted[2].exerciseName == "Overhead Press")
+        #expect(sorted[2].groupIndex == 1)
     }
 
-    @Test("deleting WorkoutTemplate cascade-deletes all TemplateSets")
+    @Test("deleting WorkoutTemplate cascade-deletes all TemplateEntries")
     func cascadeDelete() throws {
         let context = try makeTestContext()
 
         let template = WorkoutTemplate(name: "Pull Day")
-        context.insert(template)
-
-        let set0 = TemplateSet(exerciseName: "Pull-up", setIndex: 0)
-        let set1 = TemplateSet(exerciseName: "Row", setIndex: 1)
-        context.insert(set0)
-        context.insert(set1)
-        set0.template = template
-        set1.template = template
+        let e0 = TemplateEntry(entryIndex: 0, exerciseName: "Pull-up", entryType: .set)
+        let e1 = TemplateEntry(entryIndex: 1, exerciseName: "Row", entryType: .interval)
+        e0.template = template
+        e1.template = template
+        context.insert(template); context.insert(e0); context.insert(e1)
         try context.save()
 
         context.delete(template)
         try context.save()
 
-        let remainingSets = try context.fetch(FetchDescriptor<TemplateSet>())
-        #expect(remainingSets.isEmpty)
+        #expect(try context.fetch(FetchDescriptor<TemplateEntry>()).isEmpty)
     }
 
     @Test("two templates with same activityType are fetched independently")
     func sameActivityTypeIndependence() throws {
         let context = try makeTestContext()
-
         let a = WorkoutTemplate(name: "Monday Push", activityType: "Strength")
         let b = WorkoutTemplate(name: "Thursday Push", activityType: "Strength")
-        context.insert(a)
-        context.insert(b)
+        context.insert(a); context.insert(b)
         try context.save()
 
         let results = try context.fetch(FetchDescriptor<WorkoutTemplate>())
@@ -122,14 +107,12 @@ struct WorkoutTemplatePersistenceTests {
         #expect(results[0].id != results[1].id)
     }
 
-    @Test("deleting WorkoutTemplate nullifies plan.template, plan survives")
+    @Test("deleting WorkoutTemplate nullifies plan.template; plan survives")
     func templateDeletionNullifiesPlan() throws {
         let context = try makeTestContext()
-
         let template = WorkoutTemplate(name: "Push Day")
-        context.insert(template)
         let plan = PlannedWorkout(scheduledDate: .now, template: template)
-        context.insert(plan)
+        context.insert(template); context.insert(plan)
         try context.save()
 
         context.delete(template)
@@ -138,5 +121,37 @@ struct WorkoutTemplatePersistenceTests {
         let plans = try context.fetch(FetchDescriptor<PlannedWorkout>())
         #expect(plans.count == 1)
         #expect(plans[0].template == nil)
+    }
+
+    @Test("Workout.template link round-trips via WorkoutTemplate.workouts")
+    func templateWorkoutsInverse() throws {
+        let context = try makeTestContext()
+        let template = WorkoutTemplate(name: "5K Plan")
+        let workout = Workout(activityType: "Running")
+        workout.template = template
+        context.insert(template); context.insert(workout)
+        try context.save()
+
+        let fetched = try context.fetch(FetchDescriptor<WorkoutTemplate>())
+        let t = try #require(fetched.first)
+        #expect((t.workouts ?? []).count == 1)
+        #expect(t.workouts?.first?.activityType == "Running")
+    }
+
+    @Test("deleting WorkoutTemplate nullifies Workout.template; workout survives")
+    func deleteTemplateNullifiesWorkoutLink() throws {
+        let context = try makeTestContext()
+        let template = WorkoutTemplate(name: "Easy Run")
+        let workout = Workout(activityType: "Running")
+        workout.template = template
+        context.insert(template); context.insert(workout)
+        try context.save()
+
+        context.delete(template)
+        try context.save()
+
+        let workouts = try context.fetch(FetchDescriptor<Workout>())
+        #expect(workouts.count == 1)
+        #expect(workouts[0].template == nil)
     }
 }

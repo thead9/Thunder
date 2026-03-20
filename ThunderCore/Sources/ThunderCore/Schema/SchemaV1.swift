@@ -14,15 +14,14 @@ enum SchemaV1: VersionedSchema {
 
     /// All persistent model types in schema version 1.
     ///
-    /// Add new `@Model` types here as they are implemented.
-    /// The order of this array does not matter for correctness,
-    /// but keep it alphabetical for readability.
+    /// Order is alphabetical.
     static var models: [any PersistentModel.Type] {
         [
+            Equipment.self,
             PlannedWorkout.self,
-            TemplateSet.self,
+            TemplateEntry.self,
             Workout.self,
-            WorkoutSet.self,
+            WorkoutEntry.self,
             WorkoutTemplate.self,
         ]
     }
