@@ -3,10 +3,9 @@ import SwiftData
 
 /// A single logged effort within a workout session.
 ///
-/// `WorkoutEntry` is the universal unit of workout detail. It replaces
-/// separate `WorkoutSet` and `WorkoutInterval` models with a single composable
-/// type. A workout is an ordered sequence of entries — each entry records what
-/// actually happened during one discrete effort.
+/// `WorkoutEntry` is the universal unit of workout detail. A workout is an
+/// ordered sequence of entries — each entry records what actually happened
+/// during one discrete effort.
 ///
 /// ## Composability
 /// Any training modality is represented by the same model. A CrossFit workout
@@ -26,9 +25,10 @@ import SwiftData
 ///
 /// ## Single source of truth
 /// Session-level summaries (total distance, total volume, average HR) are
-/// computed from entries at the call site — never stored. The only session-level
-/// summary stored on `Workout` is `duration`, which captures total elapsed time
-/// including warmup and transitions that entries do not cover.
+/// computed from entries at the call site via `Workout+Computed` — never stored.
+/// The only session-level summary stored on `Workout` is `duration`, which
+/// captures total elapsed time including warmup and transitions that entries
+/// do not cover.
 ///
 /// ## Target fields
 /// For structured sessions where a plan existed, both target and actual values
@@ -42,7 +42,6 @@ public final class WorkoutEntry {
     public var id: UUID = UUID()
     public var entryIndex: Int = 0
     public var groupIndex: Int?
-    public var exerciseName: String = ""
     public var entryType: WorkoutEntryType = WorkoutEntryType.set
     public var notes: String?
 
@@ -83,7 +82,22 @@ public final class WorkoutEntry {
     /// Target duration for this effort, in seconds.
     public var targetDurationSeconds: Double?
 
+    /// Target rest duration after this effort, in seconds.
+    ///
+    /// Mirrors `TemplateEntry.targetRestDurationSeconds` — stored here so that
+    /// when a structured workout is started from a template the prescribed rest
+    /// period is available for per-effort target/actual comparison.
+    public var targetRestDurationSeconds: Double?
+
     public var createdAt: Date = Date.now
+
+    /// The exercise performed during this effort, if any.
+    ///
+    /// `nil` for efforts with no discrete exercise (e.g. a rest period or
+    /// unstructured time-based effort). Delete rule is `.nullify` — removing an
+    /// exercise record does not remove the entries that used it.
+    @Relationship(deleteRule: .nullify, inverse: \Exercise.workoutEntries)
+    public var exercise: Exercise?
 
     /// The workout this entry belongs to.
     ///
@@ -104,7 +118,6 @@ public final class WorkoutEntry {
         id: UUID = UUID(),
         entryIndex: Int = 0,
         groupIndex: Int? = nil,
-        exerciseName: String = "",
         entryType: WorkoutEntryType = .set,
         notes: String? = nil,
         reps: Int? = nil,
@@ -118,14 +131,15 @@ public final class WorkoutEntry {
         targetWeightKg: Double? = nil,
         targetDistanceMeters: Double? = nil,
         targetDurationSeconds: Double? = nil,
+        targetRestDurationSeconds: Double? = nil,
         createdAt: Date = .now,
+        exercise: Exercise? = nil,
         workout: Workout? = nil,
         equipment: Equipment? = nil
     ) {
         self.id = id
         self.entryIndex = entryIndex
         self.groupIndex = groupIndex
-        self.exerciseName = exerciseName
         self.entryType = entryType
         self.notes = notes
         self.reps = reps
@@ -139,7 +153,9 @@ public final class WorkoutEntry {
         self.targetWeightKg = targetWeightKg
         self.targetDistanceMeters = targetDistanceMeters
         self.targetDurationSeconds = targetDurationSeconds
+        self.targetRestDurationSeconds = targetRestDurationSeconds
         self.createdAt = createdAt
+        self.exercise = exercise
         self.workout = workout
         self.equipment = equipment
     }

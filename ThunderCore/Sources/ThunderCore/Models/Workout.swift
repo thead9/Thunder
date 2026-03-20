@@ -16,8 +16,9 @@ import SwiftData
 ///
 /// ## Single source of truth
 /// Session summaries — total distance, total volume, average HR — are computed
-/// from entries at the call site. `duration` is the only stored summary because
-/// it captures elapsed time including rest and transitions that entries do not.
+/// from entries at the call site via `Workout+Computed`. `duration` is the only
+/// stored summary because it captures elapsed time including rest and
+/// transitions that entries do not.
 ///
 /// ## Template link
 /// `template` is set once when a workout is started from a template (VIEW-6).
@@ -37,12 +38,19 @@ public final class Workout {
     /// This is NOT the sum of entry durations — it is the real-world clock from
     /// session start to end. Use entry durations for per-effort analytics.
     public var duration: TimeInterval?
-    public var activityType: String = ""
     public var notes: String?
     public var source: WorkoutSource = WorkoutSource.manual
     public var healthKitID: UUID?
     public var createdAt: Date = Date.now
     public var modifiedAt: Date = Date.now
+
+    /// The type of activity this session represents.
+    ///
+    /// Optional — a workout may be saved without an activity type selected.
+    /// Delete rule is `.nullify` — removing an `ActivityType` does not delete
+    /// the workouts that referenced it.
+    @Relationship(deleteRule: .nullify, inverse: \ActivityType.workouts)
+    public var activityType: ActivityType?
 
     /// All efforts logged within this session, in no guaranteed order.
     ///
@@ -70,7 +78,7 @@ public final class Workout {
         id: UUID = UUID(),
         date: Date = .now,
         duration: TimeInterval? = nil,
-        activityType: String = "",
+        activityType: ActivityType? = nil,
         notes: String? = nil,
         source: WorkoutSource = .manual,
         healthKitID: UUID? = nil,

@@ -19,7 +19,6 @@ public final class TemplateEntry {
     public var id: UUID = UUID()
     public var entryIndex: Int = 0
     public var groupIndex: Int?
-    public var exerciseName: String = ""
     public var entryType: WorkoutEntryType = WorkoutEntryType.set
     public var notes: String?
 
@@ -32,6 +31,13 @@ public final class TemplateEntry {
     public var targetRestDurationSeconds: Double?
 
     public var createdAt: Date = Date.now
+
+    /// The exercise prescribed for this effort, if any.
+    ///
+    /// `nil` for efforts with no discrete exercise. Delete rule is `.nullify` —
+    /// removing an exercise record does not remove the entries that referenced it.
+    @Relationship(deleteRule: .nullify, inverse: \Exercise.templateEntries)
+    public var exercise: Exercise?
 
     /// The template this entry belongs to.
     ///
@@ -52,7 +58,6 @@ public final class TemplateEntry {
         id: UUID = UUID(),
         entryIndex: Int = 0,
         groupIndex: Int? = nil,
-        exerciseName: String = "",
         entryType: WorkoutEntryType = .set,
         notes: String? = nil,
         targetReps: Int? = nil,
@@ -61,12 +66,12 @@ public final class TemplateEntry {
         targetDurationSeconds: Double? = nil,
         targetRestDurationSeconds: Double? = nil,
         createdAt: Date = .now,
+        exercise: Exercise? = nil,
         equipment: Equipment? = nil
     ) {
         self.id = id
         self.entryIndex = entryIndex
         self.groupIndex = groupIndex
-        self.exerciseName = exerciseName
         self.entryType = entryType
         self.notes = notes
         self.targetReps = targetReps
@@ -75,6 +80,7 @@ public final class TemplateEntry {
         self.targetDurationSeconds = targetDurationSeconds
         self.targetRestDurationSeconds = targetRestDurationSeconds
         self.createdAt = createdAt
+        self.exercise = exercise
         self.equipment = equipment
     }
 }

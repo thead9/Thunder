@@ -41,7 +41,7 @@ struct WorkoutEntryDefaultsTests {
 
         #expect(entry.entryIndex == 0)
         #expect(entry.groupIndex == nil)
-        #expect(entry.exerciseName == "")
+        #expect(entry.exercise == nil)
         #expect(entry.entryType == .set)
         #expect(entry.notes == nil)
         #expect(entry.reps == nil)
@@ -55,6 +55,7 @@ struct WorkoutEntryDefaultsTests {
         #expect(entry.targetWeightKg == nil)
         #expect(entry.targetDistanceMeters == nil)
         #expect(entry.targetDurationSeconds == nil)
+        #expect(entry.targetRestDurationSeconds == nil)
         #expect(entry.workout == nil)
         #expect(entry.equipment == nil)
         #expect(entry.createdAt >= before && entry.createdAt <= after)
@@ -67,26 +68,29 @@ struct WorkoutEntryPersistenceTests {
     @Test("strength set round-trips all fields")
     func strengthSetRoundTrip() throws {
         let context = try makeTestContext()
-        let workout = Workout(activityType: "Strength")
+        let workout = Workout()
+        let squat = Exercise(name: "Squat")
         let entry = WorkoutEntry(
             entryIndex: 0,
             groupIndex: 0,
-            exerciseName: "Squat",
             entryType: .set,
             reps: 5,
             weightKg: 100,
             restDurationSeconds: 180,
             targetReps: 5,
-            targetWeightKg: 100
+            targetWeightKg: 100,
+            targetRestDurationSeconds: 180,
+            exercise: squat
         )
         entry.workout = workout
         context.insert(workout)
+        context.insert(squat)
         context.insert(entry)
         try context.save()
 
         let fetched = try context.fetch(FetchDescriptor<WorkoutEntry>())
         let e = try #require(fetched.first)
-        #expect(e.exerciseName == "Squat")
+        #expect(e.exercise?.name == "Squat")
         #expect(e.entryType == .set)
         #expect(e.reps == 5)
         #expect(e.weightKg == 100)
@@ -94,25 +98,29 @@ struct WorkoutEntryPersistenceTests {
         #expect(e.restDurationSeconds == 180)
         #expect(e.targetReps == 5)
         #expect(e.targetWeightKg == 100)
+        #expect(e.targetRestDurationSeconds == 180)
     }
 
     @Test("cardio interval round-trips all fields")
     func cardioIntervalRoundTrip() throws {
         let context = try makeTestContext()
-        let workout = Workout(activityType: "Running")
+        let workout = Workout()
+        let exercise = Exercise(name: "400m repeat")
         let entry = WorkoutEntry(
             entryIndex: 0,
-            exerciseName: "400m repeat",
             entryType: .interval,
             distanceMeters: 400,
             durationSeconds: 105,
             restDurationSeconds: 60,
             heartRateBPM: 172,
             targetDistanceMeters: 400,
-            targetDurationSeconds: 100
+            targetDurationSeconds: 100,
+            targetRestDurationSeconds: 60,
+            exercise: exercise
         )
         entry.workout = workout
         context.insert(workout)
+        context.insert(exercise)
         context.insert(entry)
         try context.save()
 
@@ -123,20 +131,23 @@ struct WorkoutEntryPersistenceTests {
         #expect(e.durationSeconds == 105)
         #expect(e.heartRateBPM == 172)
         #expect(e.targetDurationSeconds == 100)
+        #expect(e.targetRestDurationSeconds == 60)
     }
 
     @Test("free effort round-trips")
     func freeEffortRoundTrip() throws {
         let context = try makeTestContext()
-        let workout = Workout(activityType: "Yoga")
+        let workout = Workout()
+        let exercise = Exercise(name: "Warrior II")
         let entry = WorkoutEntry(
             entryIndex: 0,
-            exerciseName: "Warrior II",
             entryType: .effort,
-            durationSeconds: 60
+            durationSeconds: 60,
+            exercise: exercise
         )
         entry.workout = workout
         context.insert(workout)
+        context.insert(exercise)
         context.insert(entry)
         try context.save()
 
@@ -148,17 +159,33 @@ struct WorkoutEntryPersistenceTests {
         #expect(e.distanceMeters == nil)
     }
 
+    @Test("entry with no exercise is valid")
+    func entryWithoutExercise() throws {
+        let context = try makeTestContext()
+        let workout = Workout()
+        let entry = WorkoutEntry(entryIndex: 0, entryType: .effort, durationSeconds: 300)
+        entry.workout = workout
+        context.insert(workout); context.insert(entry)
+        try context.save()
+
+        let fetched = try context.fetch(FetchDescriptor<WorkoutEntry>())
+        #expect(fetched.count == 1)
+        #expect(fetched[0].exercise == nil)
+    }
+
     @Test("mixed-modality workout — entries with different types coexist")
     func mixedModalityWorkout() throws {
         let context = try makeTestContext()
-        let workout = Workout(activityType: "CrossFit")
-        let squat = WorkoutEntry(entryIndex: 0, exerciseName: "Thruster", entryType: .set, reps: 21, weightKg: 43)
-        let row = WorkoutEntry(entryIndex: 1, exerciseName: "Row", entryType: .interval, distanceMeters: 500)
-        squat.workout = workout
-        row.workout = workout
+        let workout = Workout()
+        let thruster = Exercise(name: "Thruster")
+        let row = Exercise(name: "Row")
+        let e0 = WorkoutEntry(entryIndex: 0, entryType: .set, reps: 21, weightKg: 43, exercise: thruster)
+        let e1 = WorkoutEntry(entryIndex: 1, entryType: .interval, distanceMeters: 500, exercise: row)
+        e0.workout = workout
+        e1.workout = workout
         context.insert(workout)
-        context.insert(squat)
-        context.insert(row)
+        context.insert(thruster); context.insert(row)
+        context.insert(e0); context.insert(e1)
         try context.save()
 
         let entries = try context.fetch(
@@ -172,9 +199,9 @@ struct WorkoutEntryPersistenceTests {
     @Test("deleting Workout cascade-deletes all entries")
     func deleteWorkoutCascadesEntries() throws {
         let context = try makeTestContext()
-        let workout = Workout(activityType: "Strength")
-        let e0 = WorkoutEntry(entryIndex: 0, exerciseName: "Squat", entryType: .set)
-        let e1 = WorkoutEntry(entryIndex: 1, exerciseName: "Press", entryType: .set)
+        let workout = Workout()
+        let e0 = WorkoutEntry(entryIndex: 0, entryType: .set)
+        let e1 = WorkoutEntry(entryIndex: 1, entryType: .set)
         e0.workout = workout
         e1.workout = workout
         context.insert(workout)
@@ -191,13 +218,16 @@ struct WorkoutEntryPersistenceTests {
     @Test("entries for a workout are isolated from other workouts")
     func entryIsolation() throws {
         let context = try makeTestContext()
-        let w1 = Workout(activityType: "Strength")
-        let w2 = Workout(activityType: "Cardio")
-        let e1 = WorkoutEntry(entryIndex: 0, exerciseName: "Squat", entryType: .set)
-        let e2 = WorkoutEntry(entryIndex: 0, exerciseName: "Row", entryType: .interval)
+        let w1 = Workout()
+        let w2 = Workout()
+        let squat = Exercise(name: "Squat")
+        let row = Exercise(name: "Row")
+        let e1 = WorkoutEntry(entryIndex: 0, entryType: .set, exercise: squat)
+        let e2 = WorkoutEntry(entryIndex: 0, entryType: .interval, exercise: row)
         e1.workout = w1
         e2.workout = w2
         context.insert(w1); context.insert(w2)
+        context.insert(squat); context.insert(row)
         context.insert(e1); context.insert(e2)
         try context.save()
 
@@ -205,8 +235,8 @@ struct WorkoutEntryPersistenceTests {
         let w2Entries = (w2.entries ?? [])
         #expect(w1Entries.count == 1)
         #expect(w2Entries.count == 1)
-        #expect(w1Entries[0].exerciseName == "Squat")
-        #expect(w2Entries[0].exerciseName == "Row")
+        #expect(w1Entries[0].exercise?.name == "Squat")
+        #expect(w2Entries[0].exercise?.name == "Row")
     }
 }
 
@@ -217,11 +247,12 @@ struct WorkoutEntryEquipmentTests {
     func equipmentRoundTrip() throws {
         let context = try makeTestContext()
         let eq = Equipment(name: "Barbell", category: .strength)
-        let workout = Workout(activityType: "Strength")
-        let entry = WorkoutEntry(entryIndex: 0, exerciseName: "Deadlift", entryType: .set)
+        let workout = Workout()
+        let exercise = Exercise(name: "Deadlift")
+        let entry = WorkoutEntry(entryIndex: 0, entryType: .set, exercise: exercise)
         entry.workout = workout
         entry.equipment = eq
-        context.insert(eq); context.insert(workout); context.insert(entry)
+        context.insert(eq); context.insert(workout); context.insert(exercise); context.insert(entry)
         try context.save()
 
         let fetched = try context.fetch(FetchDescriptor<WorkoutEntry>())
@@ -232,11 +263,12 @@ struct WorkoutEntryEquipmentTests {
     func deleteEquipmentNullifiesEntry() throws {
         let context = try makeTestContext()
         let eq = Equipment(name: "Kettlebell", category: .strength)
-        let workout = Workout(activityType: "Strength")
-        let entry = WorkoutEntry(entryIndex: 0, exerciseName: "Swing", entryType: .set)
+        let workout = Workout()
+        let exercise = Exercise(name: "Swing")
+        let entry = WorkoutEntry(entryIndex: 0, entryType: .set, exercise: exercise)
         entry.workout = workout
         entry.equipment = eq
-        context.insert(eq); context.insert(workout); context.insert(entry)
+        context.insert(eq); context.insert(workout); context.insert(exercise); context.insert(entry)
         try context.save()
 
         context.delete(eq)
@@ -287,5 +319,67 @@ struct EquipmentTests {
         #expect(e.id == id)
         #expect(e.name == "Pull-up Bar")
         #expect(e.category == .bodyweight)
+    }
+}
+
+@Suite("Exercise — defaults and persistence")
+struct ExerciseTests {
+
+    @Test("all defaults correct on init")
+    func defaults() {
+        let ex = Exercise()
+        #expect(ex.name == "")
+        #expect(ex.notes == nil)
+        #expect(ex.isUserDefined == false)
+    }
+
+    @Test("insert → save → fetch round-trip")
+    func roundTrip() throws {
+        let context = try makeTestContext()
+        let id = UUID()
+        let ex = Exercise(id: id, name: "Bench Press", notes: "Flat barbell", isUserDefined: false)
+        context.insert(ex)
+        try context.save()
+
+        let fetched = try context.fetch(FetchDescriptor<Exercise>())
+        let e = try #require(fetched.first)
+        #expect(e.id == id)
+        #expect(e.name == "Bench Press")
+        #expect(e.notes == "Flat barbell")
+    }
+
+    @Test("Exercise.workoutEntries inverse is populated")
+    func workoutEntriesInverse() throws {
+        let context = try makeTestContext()
+        let workout = Workout()
+        let exercise = Exercise(name: "Squat")
+        let e0 = WorkoutEntry(entryIndex: 0, entryType: .set, exercise: exercise)
+        let e1 = WorkoutEntry(entryIndex: 1, entryType: .set, exercise: exercise)
+        e0.workout = workout; e1.workout = workout
+        context.insert(workout); context.insert(exercise)
+        context.insert(e0); context.insert(e1)
+        try context.save()
+
+        let fetched = try context.fetch(FetchDescriptor<Exercise>())
+        let ex = try #require(fetched.first)
+        #expect((ex.workoutEntries ?? []).count == 2)
+    }
+
+    @Test("deleting Exercise nullifies entry.exercise; entry survives")
+    func deleteExerciseNullifiesEntry() throws {
+        let context = try makeTestContext()
+        let workout = Workout()
+        let exercise = Exercise(name: "Deadlift")
+        let entry = WorkoutEntry(entryIndex: 0, entryType: .set, exercise: exercise)
+        entry.workout = workout
+        context.insert(workout); context.insert(exercise); context.insert(entry)
+        try context.save()
+
+        context.delete(exercise)
+        try context.save()
+
+        let entries = try context.fetch(FetchDescriptor<WorkoutEntry>())
+        #expect(entries.count == 1)
+        #expect(entries[0].exercise == nil)
     }
 }

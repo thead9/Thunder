@@ -91,7 +91,8 @@ The iOS Engineer knows these frameworks deeply and reaches for them before any t
 - Previews for every view — `#Preview` with representative data using in-memory `ModelContainer`
 - No magic numbers or hardcoded strings — constants are named, localized strings use `String(localized:)`
 - All public interfaces documented with doc comments
-- `@Relationship` array properties on `@Model` types must be defaulted at the declaration site (`var sets = [WorkoutSet]()`), not in `init`. SwiftData's macro wraps relationship properties in internal backing storage before `init` runs — assigning to them in `init` causes a runtime crash. Regular stored properties are unaffected and may be initialized in `init` as normal.
+- `@Relationship` properties must **never** be assigned in `init` — SwiftData's macro wraps relationship properties in internal backing storage before `init` runs, and assigning to them in `init` causes a runtime crash. Regular stored properties are unaffected.
+- All to-many relationships in this project sync via CloudKit and must be declared as `[Model]?` per the Data Architect's CloudKit rules (see Data Architect.md). Optional relationship arrays default to `nil` at the declaration site automatically — no `= [Model]()` default and no `init` assignment is needed or correct. Non-optional relationship arrays (`var entries = [WorkoutEntry]()`) are not CloudKit-compatible and must not be used.
 
 ---
 

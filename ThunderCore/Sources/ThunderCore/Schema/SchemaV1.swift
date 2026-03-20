@@ -17,7 +17,9 @@ enum SchemaV1: VersionedSchema {
     /// Order is alphabetical.
     static var models: [any PersistentModel.Type] {
         [
+            ActivityType.self,
             Equipment.self,
+            Exercise.self,
             PlannedWorkout.self,
             TemplateEntry.self,
             Workout.self,
