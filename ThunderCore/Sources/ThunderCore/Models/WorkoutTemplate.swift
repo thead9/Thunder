@@ -37,6 +37,16 @@ public final class WorkoutTemplate {
     @Relationship(deleteRule: .nullify)
     public var plans: [PlannedWorkout]?
 
+    // MARK: - SchemaV2 additions
+
+    /// Workouts that were started from this template.
+    ///
+    /// The inverse of `Workout.template`. Delete rule is `.nullify` — deleting
+    /// a template sets `Workout.template` to `nil` on all associated logs but
+    /// does not delete them. Use `workouts ?? []` at call sites.
+    @Relationship(deleteRule: .nullify)
+    public var workouts: [Workout]?
+
     public init(
         id: UUID = UUID(),
         name: String = "",

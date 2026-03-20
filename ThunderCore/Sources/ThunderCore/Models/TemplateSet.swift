@@ -28,6 +28,15 @@ public final class TemplateSet {
     @Relationship(deleteRule: .nullify, inverse: \WorkoutTemplate.sets)
     public var template: WorkoutTemplate?
 
+    // MARK: - SchemaV2 additions
+
+    /// The equipment targeted for this template set, if any.
+    ///
+    /// Delete rule is `.nullify` — deleting a piece of equipment does not delete
+    /// the template sets that referenced it; the reference is simply set to `nil`.
+    @Relationship(deleteRule: .nullify, inverse: \Equipment.templateSets)
+    public var equipment: Equipment?
+
     public init(
         id: UUID = UUID(),
         exerciseName: String = "",
@@ -37,7 +46,8 @@ public final class TemplateSet {
         targetDistanceMeters: Double? = nil,
         targetDurationSeconds: Double? = nil,
         notes: String? = nil,
-        createdAt: Date = .now
+        createdAt: Date = .now,
+        equipment: Equipment? = nil
     ) {
         self.id = id
         self.exerciseName = exerciseName
@@ -48,5 +58,6 @@ public final class TemplateSet {
         self.targetDurationSeconds = targetDurationSeconds
         self.notes = notes
         self.createdAt = createdAt
+        self.equipment = equipment
     }
 }

@@ -25,21 +25,24 @@ enum ThunderMigrationPlan: SchemaMigrationPlan {
     /// schema version is introduced, update this alias — the container and
     /// all dependents update automatically.
     ///
-    /// ## When adding SchemaV2:
-    /// ```swift
-    /// typealias Current = SchemaV2
-    /// ```
-    typealias Current = SchemaV1
+    typealias Current = SchemaV2
 
     /// All schema versions in chronological order.
     /// The first element is the oldest version; the last is current.
     static var schemas: [any VersionedSchema.Type] {
-        [SchemaV1.self]
+        [SchemaV1.self, SchemaV2.self]
     }
 
     /// Migration stages between consecutive schema versions.
-    /// Empty until a second schema version is introduced.
     static var stages: [MigrationStage] {
-        []
+        [
+            // V1→V2 is a lightweight migration: all new fields are optional
+            // or carry defaults, and all new model types (Equipment, WorkoutInterval)
+            // are additive. No data transformation is required.
+            MigrationStage.lightweight(
+                fromVersion: SchemaV1.self,
+                toVersion: SchemaV2.self
+            ),
+        ]
     }
 }

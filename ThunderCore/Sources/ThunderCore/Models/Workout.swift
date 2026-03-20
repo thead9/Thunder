@@ -42,6 +42,38 @@ public final class Workout {
     @Relationship(deleteRule: .nullify)
     public var plannedWorkouts: [PlannedWorkout]?
 
+    // MARK: - SchemaV2 additions
+
+    /// Total distance logged for this workout, in meters.
+    ///
+    /// Populated for cardio workouts. `nil` for strength-only sessions.
+    public var distanceMeters: Double?
+
+    /// Elevation gain for this workout, in meters.
+    public var elevationGainMeters: Double?
+
+    /// Average heart rate across the session, in beats per minute.
+    public var averageHeartRateBPM: Double?
+
+    /// Peak heart rate recorded during the session, in beats per minute.
+    public var maxHeartRateBPM: Double?
+
+    /// The template this workout was started from, if any.
+    ///
+    /// Set once on save when a workout is initiated via VIEW-6 (Log from Template).
+    /// `nil` for all other workouts. Delete rule is `.nullify` — the template
+    /// survives if the workout log is deleted.
+    @Relationship(deleteRule: .nullify, inverse: \WorkoutTemplate.workouts)
+    public var template: WorkoutTemplate?
+
+    /// The structured cardio intervals logged within this workout.
+    ///
+    /// Sort by `intervalIndex` when displaying. Delete rule is `.cascade` —
+    /// all associated `WorkoutInterval` records are deleted when this workout
+    /// is deleted. Use `intervals ?? []` at call sites.
+    @Relationship(deleteRule: .cascade)
+    public var intervals: [WorkoutInterval]?
+
     /// The UUID of the correlated `HKWorkout`, if one exists.
     ///
     /// Populated by the HealthKit service (BIZ-2). `nil` for manually entered workouts

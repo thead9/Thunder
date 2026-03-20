@@ -42,6 +42,15 @@ public final class WorkoutSet {
     @Relationship(deleteRule: .nullify, inverse: \Workout.sets)
     public var workout: Workout?
 
+    // MARK: - SchemaV2 additions
+
+    /// The equipment used for this set, if any.
+    ///
+    /// Delete rule is `.nullify` — deleting a piece of equipment does not delete
+    /// the sets that used it; the reference is simply set to `nil`.
+    @Relationship(deleteRule: .nullify, inverse: \Equipment.workoutSets)
+    public var equipment: Equipment?
+
     public init(
         id: UUID = UUID(),
         exerciseName: String = "",
@@ -52,7 +61,8 @@ public final class WorkoutSet {
         durationSeconds: Double? = nil,
         notes: String? = nil,
         createdAt: Date = .now,
-        workout: Workout? = nil
+        workout: Workout? = nil,
+        equipment: Equipment? = nil
     ) {
         self.id = id
         self.exerciseName = exerciseName
@@ -64,5 +74,6 @@ public final class WorkoutSet {
         self.notes = notes
         self.createdAt = createdAt
         self.workout = workout
+        self.equipment = equipment
     }
 }

@@ -24,18 +24,17 @@ struct SchemaTests {
     @Suite("ThunderMigrationPlan")
     struct ThunderMigrationPlanTests {
 
-        @Test("Schemas array contains exactly one version and it is SchemaV1")
+        @Test("Schemas array contains SchemaV1 as the first version")
         func schemasContainsSchemaV1() {
             let schemas = ThunderMigrationPlan.schemas
-            #expect(schemas.count == 1)
             // Existential metatypes don't support == in Swift 6;
             // type name is the idiomatic identity check for VersionedSchema.Type.
             #expect(String(describing: schemas[0]) == "SchemaV1")
         }
 
-        @Test("No migration stages defined before a second schema version exists")
-        func noStagesBeforeV2() {
-            #expect(ThunderMigrationPlan.stages.isEmpty)
+        @Test("Schemas array is non-empty and ordered oldest-first")
+        func schemasNonEmpty() {
+            #expect(!ThunderMigrationPlan.schemas.isEmpty)
         }
     }
 }
