@@ -41,7 +41,7 @@ struct PlannedWorkoutPersistenceTests {
         context.insert(plan)
         try context.save()
 
-        let workout = Workout(activityType: "Strength")
+        let workout = Workout()
         context.insert(workout)
         plan.status = .completed
         plan.workout = workout
@@ -59,7 +59,7 @@ struct PlannedWorkoutPersistenceTests {
     func workoutDeletionNullifiesPlan() throws {
         let context = try makeTestContext()
 
-        let workout = Workout(activityType: "Running")
+        let workout = Workout()
         context.insert(workout)
         let plan = PlannedWorkout(scheduledDate: .now, status: .completed, workout: workout)
         context.insert(plan)
