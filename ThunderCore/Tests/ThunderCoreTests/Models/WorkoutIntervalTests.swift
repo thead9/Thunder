@@ -21,53 +21,73 @@ struct WorkoutIntervalDefaultsTests {
         #expect(interval.restDurationSeconds == nil)
         #expect(interval.heartRateAverageBPM == nil)
         #expect(interval.notes == nil)
-        #expect(interval.workout == nil)
+        #expect(interval.cardio == nil)
         #expect(interval.equipment == nil)
         #expect(interval.createdAt >= before && interval.createdAt <= after)
     }
 }
 
-@Suite("WorkoutInterval — persistence")
-struct WorkoutIntervalPersistenceTests {
+@Suite("CardioComponent — default field values")
+struct CardioComponentDefaultsTests {
 
-    @Test("Workout with multiple intervals — fetch via relationship, confirm count and ordering")
-    func workoutIntervalsRelationship() throws {
+    @Test("all defaults are set correctly on init")
+    func defaults() {
+        let before = Date.now
+        let c = CardioComponent()
+        let after = Date.now
+
+        #expect(c.distanceMeters == nil)
+        #expect(c.elevationGainMeters == nil)
+        #expect(c.averageHeartRateBPM == nil)
+        #expect(c.maxHeartRateBPM == nil)
+        #expect(c.workout == nil)
+        #expect(c.intervals == nil)
+        #expect(c.createdAt >= before && c.createdAt <= after)
+    }
+}
+
+@Suite("CardioComponent — persistence")
+struct CardioComponentPersistenceTests {
+
+    @Test("CardioComponent attached to Workout round-trips through save")
+    func roundTrip() throws {
         let context = try makeTestContext()
 
         let workout = Workout(activityType: "Running")
-        let i0 = WorkoutInterval(exerciseName: "400m", intervalIndex: 0, actualDistanceMeters: 400)
-        let i1 = WorkoutInterval(exerciseName: "400m", intervalIndex: 1, actualDistanceMeters: 400)
-        let i2 = WorkoutInterval(exerciseName: "400m", intervalIndex: 2, actualDistanceMeters: 400)
-        i0.workout = workout
-        i1.workout = workout
-        i2.workout = workout
+        let cardio = CardioComponent(
+            distanceMeters: 5000,
+            elevationGainMeters: 42,
+            averageHeartRateBPM: 148,
+            maxHeartRateBPM: 172
+        )
+        workout.cardio = cardio
 
         context.insert(workout)
-        context.insert(i0)
-        context.insert(i1)
-        context.insert(i2)
+        context.insert(cardio)
         try context.save()
 
-        let fetched = try context.fetch(FetchDescriptor<Workout>())
-        let w = try #require(fetched.first)
-        let intervals = (w.intervals ?? []).sorted { $0.intervalIndex < $1.intervalIndex }
-        #expect(intervals.count == 3)
-        #expect(intervals[0].intervalIndex == 0)
-        #expect(intervals[1].intervalIndex == 1)
-        #expect(intervals[2].intervalIndex == 2)
+        let fetchedWorkouts = try context.fetch(FetchDescriptor<Workout>())
+        let w = try #require(fetchedWorkouts.first)
+        #expect(w.cardio?.distanceMeters == 5000)
+        #expect(w.cardio?.elevationGainMeters == 42)
+        #expect(w.cardio?.averageHeartRateBPM == 148)
+        #expect(w.cardio?.maxHeartRateBPM == 172)
     }
 
-    @Test("deleting Workout cascade-deletes all WorkoutInterval records")
-    func deleteWorkoutCascadesIntervals() throws {
+    @Test("deleting Workout cascade-deletes CardioComponent and all its intervals")
+    func deleteWorkoutCascadesComponentAndIntervals() throws {
         let context = try makeTestContext()
 
         let workout = Workout(activityType: "Rowing")
+        let cardio = CardioComponent(distanceMeters: 2000)
         let i0 = WorkoutInterval(exerciseName: "500m", intervalIndex: 0)
         let i1 = WorkoutInterval(exerciseName: "500m", intervalIndex: 1)
-        i0.workout = workout
-        i1.workout = workout
+        workout.cardio = cardio
+        i0.cardio = cardio
+        i1.cardio = cardio
 
         context.insert(workout)
+        context.insert(cardio)
         context.insert(i0)
         context.insert(i1)
         try context.save()
@@ -75,35 +95,82 @@ struct WorkoutIntervalPersistenceTests {
         context.delete(workout)
         try context.save()
 
-        let remainingIntervals = try context.fetch(FetchDescriptor<WorkoutInterval>())
-        #expect(remainingIntervals.isEmpty)
+        #expect(try context.fetch(FetchDescriptor<CardioComponent>()).isEmpty)
+        #expect(try context.fetch(FetchDescriptor<WorkoutInterval>()).isEmpty)
+        #expect(try context.fetch(FetchDescriptor<Workout>()).isEmpty)
+    }
+
+    @Test("Workout with intervals — fetch via component relationship, confirm count and ordering")
+    func workoutIntervalsViaComponent() throws {
+        let context = try makeTestContext()
+
+        let workout = Workout(activityType: "Running")
+        let cardio = CardioComponent(distanceMeters: 1600)
+        let i0 = WorkoutInterval(exerciseName: "400m", intervalIndex: 0, actualDistanceMeters: 400)
+        let i1 = WorkoutInterval(exerciseName: "400m", intervalIndex: 1, actualDistanceMeters: 400)
+        let i2 = WorkoutInterval(exerciseName: "400m", intervalIndex: 2, actualDistanceMeters: 400)
+        workout.cardio = cardio
+        i0.cardio = cardio
+        i1.cardio = cardio
+        i2.cardio = cardio
+
+        context.insert(workout)
+        context.insert(cardio)
+        context.insert(i0)
+        context.insert(i1)
+        context.insert(i2)
+        try context.save()
+
+        let fetched = try context.fetch(FetchDescriptor<Workout>())
+        let w = try #require(fetched.first)
+        let intervals = (w.cardio?.intervals ?? []).sorted { $0.intervalIndex < $1.intervalIndex }
+        #expect(intervals.count == 3)
+        #expect(intervals[0].intervalIndex == 0)
+        #expect(intervals[1].intervalIndex == 1)
+        #expect(intervals[2].intervalIndex == 2)
     }
 
     @Test("WorkoutInterval with equipment round-trips through save")
     func intervalEquipmentRoundTrip() throws {
         let context = try makeTestContext()
 
-        let eq = Equipment(name: "Rowing Machine", category: "Cardio")
+        let eq = Equipment(name: "Rowing Machine", category: .cardio)
         let workout = Workout(activityType: "Rowing")
+        let cardio = CardioComponent(distanceMeters: 500)
         let interval = WorkoutInterval(
             exerciseName: "500m",
             intervalIndex: 0,
             actualDistanceMeters: 500,
             heartRateAverageBPM: 155
         )
-        interval.workout = workout
+        workout.cardio = cardio
+        interval.cardio = cardio
         interval.equipment = eq
 
         context.insert(eq)
         context.insert(workout)
+        context.insert(cardio)
         context.insert(interval)
         try context.save()
 
-        let fetched = try context.fetch(FetchDescriptor<WorkoutInterval>())
-        let i = try #require(fetched.first)
+        let fetchedIntervals = try context.fetch(FetchDescriptor<WorkoutInterval>())
+        let i = try #require(fetchedIntervals.first)
         #expect(i.equipment?.name == "Rowing Machine")
         #expect(i.heartRateAverageBPM == 155)
         #expect(i.actualDistanceMeters == 500)
+    }
+
+    @Test("strength-only Workout has nil cardio component")
+    func strengthWorkoutHasNilCardio() throws {
+        let context = try makeTestContext()
+
+        let workout = Workout(activityType: "Strength")
+        context.insert(workout)
+        try context.save()
+
+        let fetched = try context.fetch(FetchDescriptor<Workout>())
+        let w = try #require(fetched.first)
+        #expect(w.cardio == nil)
     }
 }
 

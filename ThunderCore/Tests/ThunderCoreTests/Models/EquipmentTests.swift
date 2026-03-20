@@ -13,7 +13,7 @@ struct EquipmentDefaultsTests {
         let after = Date.now
 
         #expect(eq.name == "")
-        #expect(eq.category == "")
+        #expect(eq.category == .other)
         #expect(eq.notes == nil)
         #expect(eq.isUserDefined == false)
         #expect(eq.createdAt >= before && eq.createdAt <= after)
@@ -25,12 +25,20 @@ struct EquipmentDefaultsTests {
         #expect(eq.isUserDefined == true)
         #expect(eq.name == "Custom Bar")
     }
+
+    @Test("category enum round-trips for all cases")
+    func categoryRoundTrip() {
+        for category in EquipmentCategory.allCases {
+            let eq = Equipment(category: category)
+            #expect(eq.category == category)
+        }
+    }
 }
 
 @Suite("Equipment — persistence")
 struct EquipmentPersistenceTests {
 
-    @Test("insert → save → fetch round-trip preserves all fields")
+    @Test("insert → save → fetch round-trip preserves all fields including category enum")
     func roundTrip() throws {
         let context = try makeTestContext()
         let id = UUID()
@@ -39,7 +47,7 @@ struct EquipmentPersistenceTests {
         let eq = Equipment(
             id: id,
             name: "Barbell",
-            category: "Strength",
+            category: .strength,
             notes: "Standard 20 kg bar",
             isUserDefined: false,
             createdAt: created
@@ -52,7 +60,7 @@ struct EquipmentPersistenceTests {
         let e = try #require(fetched.first)
         #expect(e.id == id)
         #expect(e.name == "Barbell")
-        #expect(e.category == "Strength")
+        #expect(e.category == .strength)
         #expect(e.notes == "Standard 20 kg bar")
         #expect(e.isUserDefined == false)
         #expect(e.createdAt == created)
@@ -66,7 +74,7 @@ struct EquipmentRelationshipTests {
     func equipmentWorkoutSetRoundTrip() throws {
         let context = try makeTestContext()
 
-        let eq = Equipment(name: "Dumbbells", category: "Strength")
+        let eq = Equipment(name: "Dumbbells", category: .strength)
         let workout = Workout(activityType: "Strength")
         let set = WorkoutSet(exerciseName: "Curl", setIndex: 0)
         set.workout = workout
@@ -86,7 +94,7 @@ struct EquipmentRelationshipTests {
     func deleteEquipmentNullifiesSet() throws {
         let context = try makeTestContext()
 
-        let eq = Equipment(name: "Kettlebell", category: "Strength")
+        let eq = Equipment(name: "Kettlebell", category: .strength)
         let workout = Workout(activityType: "Strength")
         let set = WorkoutSet(exerciseName: "Swing", setIndex: 0)
         set.workout = workout
@@ -112,7 +120,7 @@ struct EquipmentRelationshipTests {
     func equipmentTemplateSetRoundTrip() throws {
         let context = try makeTestContext()
 
-        let eq = Equipment(name: "Cable Machine", category: "Strength")
+        let eq = Equipment(name: "Cable Machine", category: .strength)
         let template = WorkoutTemplate(name: "Push Day")
         let tset = TemplateSet(exerciseName: "Tricep Pushdown", setIndex: 0)
         tset.template = template

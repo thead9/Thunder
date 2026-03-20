@@ -44,20 +44,6 @@ public final class Workout {
 
     // MARK: - SchemaV2 additions
 
-    /// Total distance logged for this workout, in meters.
-    ///
-    /// Populated for cardio workouts. `nil` for strength-only sessions.
-    public var distanceMeters: Double?
-
-    /// Elevation gain for this workout, in meters.
-    public var elevationGainMeters: Double?
-
-    /// Average heart rate across the session, in beats per minute.
-    public var averageHeartRateBPM: Double?
-
-    /// Peak heart rate recorded during the session, in beats per minute.
-    public var maxHeartRateBPM: Double?
-
     /// The template this workout was started from, if any.
     ///
     /// Set once on save when a workout is initiated via VIEW-6 (Log from Template).
@@ -66,13 +52,13 @@ public final class Workout {
     @Relationship(deleteRule: .nullify, inverse: \WorkoutTemplate.workouts)
     public var template: WorkoutTemplate?
 
-    /// The structured cardio intervals logged within this workout.
+    /// Cardio-specific detail for this workout, if it is a cardio session.
     ///
-    /// Sort by `intervalIndex` when displaying. Delete rule is `.cascade` —
-    /// all associated `WorkoutInterval` records are deleted when this workout
-    /// is deleted. Use `intervals ?? []` at call sites.
+    /// `nil` for strength-only or other non-cardio sessions. Delete rule is
+    /// `.cascade` — the component is deleted with the workout. Interval detail
+    /// lives on the `CardioComponent`, not directly here.
     @Relationship(deleteRule: .cascade)
-    public var intervals: [WorkoutInterval]?
+    public var cardio: CardioComponent?
 
     /// The UUID of the correlated `HKWorkout`, if one exists.
     ///

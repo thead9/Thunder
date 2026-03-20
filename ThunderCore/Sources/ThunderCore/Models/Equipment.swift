@@ -23,10 +23,9 @@ public final class Equipment {
 
     /// Broad grouping for display and filtering.
     ///
-    /// Example values: "Strength", "Cardio", "Bodyweight".
-    /// Stored as `String` rather than an enum so new categories can be added
-    /// without a migration.
-    public var category: String = ""
+    /// Stored as its `String` raw value — adding new `EquipmentCategory` cases
+    /// in a future schema version is non-breaking.
+    public var category: EquipmentCategory = EquipmentCategory.other
     public var notes: String?
 
     /// `false` for seeded vocabulary items; `true` for user-created equipment.
@@ -55,7 +54,7 @@ public final class Equipment {
     public init(
         id: UUID = UUID(),
         name: String = "",
-        category: String = "",
+        category: EquipmentCategory = .other,
         notes: String? = nil,
         isUserDefined: Bool = false,
         createdAt: Date = .now

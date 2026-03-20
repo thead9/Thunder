@@ -1,20 +1,22 @@
 import Foundation
 import SwiftData
 
-/// A single interval within a structured cardio workout.
+/// A single interval within a structured cardio session.
 ///
 /// `WorkoutInterval` captures the per-interval detail for structured cardio
-/// sessions (e.g. 8×400m repeats). It is optional — a `Workout` with no
-/// intervals is valid and common for unstructured cardio or strength sessions.
+/// sessions (e.g. 8×400m repeats). It belongs to a `CardioComponent`, not
+/// directly to a `Workout` — intervals are semantically part of the cardio
+/// session and do not exist independently.
 ///
 /// ## Ordering
 /// Sort by `intervalIndex` when displaying. The index is caller-managed;
 /// this model does not enforce uniqueness.
 ///
-/// ## Relationship to Workout
-/// Each `WorkoutInterval` belongs to exactly one `Workout`. Delete rule on this
-/// side is `.nullify` — the reference becomes `nil` if the parent is removed
-/// without triggering the cascade. The cascade is declared on `Workout.intervals`.
+/// ## Relationship to CardioComponent
+/// Each `WorkoutInterval` belongs to exactly one `CardioComponent`. Delete
+/// rule on this side is `.nullify` — the reference becomes `nil` if the parent
+/// is removed without triggering the cascade. The cascade that deletes intervals
+/// when a `CardioComponent` is deleted is declared on `CardioComponent.intervals`.
 ///
 /// ## Equipment
 /// An optional `Equipment` reference captures what was used (e.g. "Rowing Machine").
@@ -33,14 +35,14 @@ public final class WorkoutInterval {
     public var notes: String?
     public var createdAt: Date = Date.now
 
-    /// The parent workout this interval belongs to.
+    /// The cardio component this interval belongs to.
     ///
     /// Delete rule is `.nullify` — if the parent is removed without triggering
     /// the cascade, the reference becomes `nil` rather than a dangling pointer.
-    /// The cascade that deletes intervals when a workout is deleted is declared
-    /// on `Workout.intervals`.
-    @Relationship(deleteRule: .nullify, inverse: \Workout.intervals)
-    public var workout: Workout?
+    /// The cascade that deletes intervals when a `CardioComponent` is deleted is
+    /// declared on `CardioComponent.intervals`.
+    @Relationship(deleteRule: .nullify, inverse: \CardioComponent.intervals)
+    public var cardio: CardioComponent?
 
     /// The equipment used during this interval, if any.
     ///
@@ -60,7 +62,7 @@ public final class WorkoutInterval {
         heartRateAverageBPM: Double? = nil,
         notes: String? = nil,
         createdAt: Date = .now,
-        workout: Workout? = nil,
+        cardio: CardioComponent? = nil,
         equipment: Equipment? = nil
     ) {
         self.id = id
@@ -74,7 +76,7 @@ public final class WorkoutInterval {
         self.heartRateAverageBPM = heartRateAverageBPM
         self.notes = notes
         self.createdAt = createdAt
-        self.workout = workout
+        self.cardio = cardio
         self.equipment = equipment
     }
 }
